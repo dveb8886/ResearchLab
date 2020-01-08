@@ -1,0 +1,12 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Adding numbers</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/add.css') }}">
+    <script src="{{ url_for('static', filename='js/add.js') }}"></script>
+</head>
+<body>
+    <p><span class="a">{{ a }}</span> + <span class="b">{{ b }}</span> = <span class="answer">{{ answer }}</span></p>
+</body>
+</html>

@@ -1,0 +1,18 @@
+span.a {
+    color: #F00;
+    font-weight: bold;
+}
+
+span.b {
+    color: #0F0;
+    font-weight: bold;
+}
+
+span.answer {
+    color: #000;
+    font-weight: bold;
+}
+
+span.highlight {
+    background-color: green;
+}
