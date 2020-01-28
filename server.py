@@ -14,3 +14,7 @@ def home():
 def add(a, b):
     answer = arithmeticController.add(a, b)
     return render_template('add.html', a=a, b=b, answer=answer)
+
+@app.route('/graph')
+def graph():
+    return render_template('chart.html')
