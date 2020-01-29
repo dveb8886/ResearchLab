@@ -1,0 +1,27 @@
+.table_tag, th, td {
+    border-collapse: collapse;
+    border: 1px solid #03A;
+}
+
+.table_colHeader {
+
+}
+
+.table_rowHeader {
+
+}
+
+.table_row {
+
+}
+
+.table_valueContainer {
+
+}
+
+.table_valueInput {
+    width: 70px;
+    text-align: right;
+    margin-right: 1px;
+    border-style: none;
+}

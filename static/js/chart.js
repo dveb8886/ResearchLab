@@ -25,12 +25,52 @@ function getValueY(e, myChart){
     return map(pos.y, chartArea.bottom, chartArea.top, yAxis.min, yAxis.max);
 }
 
+function datasetAsHTable(dataset){
+    var html = '<table class="table_tag">';
+    html += '<tr> <th>#</th>';
+
+    var columnCount = 0;
+    for (var item of dataset.labels){
+        html += '<th class="table_colHeader">'+item+'</th>'; // column header
+        columnCount += 1;
+    }
+
+    var idx = 0;
+    for (var item of dataset.datasets){
+        html += '<tr class="table_row"><td class="table_rowHeader">'+item.label+'</td>'; // row header
+        for (i=0; i<columnCount; i++){
+            value = dataset.datasets[idx].data[i]
+            html += '<td class="table_valueContainer"><input class="table_valueInput" onkeydown="changeValue(this)" type="text" dataset="'+idx+'" index="'+i+'" value="'+value.toFixed(3)+'"></td>';
+        }
+        html += '</tr>';
+        idx += 1;
+    }
+
+    html += '</tr>';
+    html += '</table>';
+    return html;
+}
+
+function changeValue(ele){
+    if (event.key === 'Enter' || event.key === 'Tab'){
+        var data = myChart.data;
+        datasetIndex = ele.getAttribute("dataset");
+        valueIndex = ele.getAttribute("index");
+        data.datasets[datasetIndex].data[valueIndex] = parseFloat(ele.value);
+        myChart.update();
+        // chartdiv.innerHTML = datasetAsHTable(myChart.data);
+    }
+}
+
+var myChart = null;
+var chartdiv = null;
 window.addEventListener('load', function(){
     var canvas = document.getElementById('myChart');
     var ctx = canvas.getContext('2d');
     var hovertxt = document.getElementById('hovertxt');
     var clicktxt = document.getElementById('clicktxt');
-    var myChart = new Chart(ctx, {
+    chartdiv = document.getElementById('theTable');
+    myChart = new Chart(ctx, {
         type: 'line',
         data: {
             labels: ['One', 'Two', 'Three', 'Four', 'Five', 'Six'],
@@ -75,9 +115,9 @@ window.addEventListener('load', function(){
         if (ele.length > 0){
             dIndex = ele[0]._datasetIndex;
             cIndex = ele[0]._index;
-            clicktxt.innerHTML = "click: data="+ele[0]._datasetIndex+", index="+ele[0]._index;
+            // clicktxt.innerHTML = "click: data="+ele[0]._datasetIndex+", index="+ele[0]._index;
         } else {
-            clicktxt.innerHTML = "click: nothing";
+            // clicktxt.innerHTML = "click: nothing";
         }
 
 
@@ -85,14 +125,19 @@ window.addEventListener('load', function(){
 
     canvas.onmouseup = function(e){
         var yValue = getValueY(e, myChart)
-        hovertxt.innerHTML = yValue;
+        // hovertxt.innerHTML = yValue;
 
         if (dIndex > -1){
             var data = myChart.data;
             data.datasets[dIndex].data[cIndex] = yValue;
             myChart.update();
+            chartdiv.innerHTML = datasetAsHTable(myChart.data);
             dIndex = -1;
         }
     }
+
+
+    chartdiv.innerHTML = datasetAsHTable(myChart.data);
+
 
 })

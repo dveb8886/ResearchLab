@@ -3,12 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/chart.css') }}">
     <script src="{{ url_for('static', filename='js/Chart.bundle.min.js') }}"></script>
     <script src="{{ url_for('static', filename='js/chart.js') }}"></script>
 </head>
 <body>
     <canvas id="myChart" width="300" height="100"></canvas>
-    <div id="hovertxt">x</div>
-    <div id="clicktxt">x</div>
+    <div id="theTable"></div>
+    <div id="hovertxt"></div>
+    <div id="clicktxt"></div>
 </body>
 </html>
