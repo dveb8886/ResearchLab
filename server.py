@@ -1,7 +1,8 @@
 import sys
+import json
 sys.path.insert(0, 'controllers')
 
-from flask import Flask, render_template
+from flask import Flask, render_template, jsonify, request
 app = Flask(__name__)
 
 import arithmeticController
@@ -18,3 +19,11 @@ def add(a, b):
 @app.route('/graph')
 def graph():
     return render_template('chart.html')
+
+@app.route('/graph/calc', methods=["POST"])
+def graph_calc():
+    # print(request.data)
+    # print(request.json)
+    # print(request.form)
+    # print(request)
+    return jsonify(arithmeticController.calc_graph(request.json))

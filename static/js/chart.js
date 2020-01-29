@@ -17,15 +17,15 @@ function map(value, start1, stop1, start2, stop2) {
     return start2 + (stop2 - start2) * ((value - start1) / (stop1 - start1))
 }
 
-function getValueY(e, myChart){
+function getValueY(e, chart){
     const helpers = Chart.helpers;
-    var pos = helpers.getRelativePosition(e, myChart);
-    var chartArea = myChart.chartArea;
-    var yAxis = myChart.scales['y-axis-0'];
+    var pos = helpers.getRelativePosition(e, chart);
+    var chartArea = chart.chartArea;
+    var yAxis = chart.scales['y-axis-0'];
     return map(pos.y, chartArea.bottom, chartArea.top, yAxis.min, yAxis.max);
 }
 
-function datasetAsHTable(dataset){
+function datasetAsHTable(dataset, interactable){
     var html = '<table class="table_tag">';
     html += '<tr> <th>#</th>';
 
@@ -37,10 +37,15 @@ function datasetAsHTable(dataset){
 
     var idx = 0;
     for (var item of dataset.datasets){
-        html += '<tr class="table_row"><td class="table_rowHeader">'+item.label+'</td>'; // row header
+        html += '<tr style="background-color: '+item.backgroundColor+'" class="table_row"><td class="table_rowHeader">'+item.label+'</td>'; // row header
         for (i=0; i<columnCount; i++){
             value = dataset.datasets[idx].data[i]
-            html += '<td class="table_valueContainer"><input class="table_valueInput" onkeydown="changeValue(this)" type="text" dataset="'+idx+'" index="'+i+'" value="'+value.toFixed(3)+'"></td>';
+            if (interactable){
+                html += '<td class="table_valueContainer"><input class="table_valueInput" onkeydown="changeValue(this)" type="text" dataset="'+idx+'" index="'+i+'" value="'+value.toFixed(3)+'"></td>';
+            } else {
+                html += '<td class="table_valueContainer">'+value.toFixed(3)+'</td>';
+            }
+
         }
         html += '</tr>';
         idx += 1;
@@ -53,47 +58,37 @@ function datasetAsHTable(dataset){
 
 function changeValue(ele){
     if (event.key === 'Enter' || event.key === 'Tab'){
-        var data = myChart.data;
+        var data = setupChart.data;
         datasetIndex = ele.getAttribute("dataset");
         valueIndex = ele.getAttribute("index");
         data.datasets[datasetIndex].data[valueIndex] = parseFloat(ele.value);
-        myChart.update();
-        // chartdiv.innerHTML = datasetAsHTable(myChart.data);
+        setupChart.update();
+        // chartdiv.innerHTML = datasetAsHTable(setupChart.data);
     }
 }
 
-var myChart = null;
+var setupChart = null;
 var chartdiv = null;
-window.addEventListener('load', function(){
-    var canvas = document.getElementById('myChart');
-    var ctx = canvas.getContext('2d');
-    var hovertxt = document.getElementById('hovertxt');
-    var clicktxt = document.getElementById('clicktxt');
-    chartdiv = document.getElementById('theTable');
-    myChart = new Chart(ctx, {
+function createSetupChartAndTable(){
+    var setupCanvas = document.getElementById('setupChart');
+    var setupCtx = setupCanvas.getContext('2d');
+    chartdiv = document.getElementById('setupTable');
+    setupChart = new Chart(setupCtx, {
         type: 'line',
         data: {
             labels: ['One', 'Two', 'Three', 'Four', 'Five', 'Six'],
             datasets: [{
                 label: 'Red',
-                data: [12, 19, 3, 5, 2, 3],
-                backgroundColor: [
-                    'rgba(255, 99, 132, 0.2)'
-                ],
-                borderColor: [
-                    'rgba(255, 99, 132, 1)'
-                ],
+                data: [15, 19, 3, 5, 5, 3],
+                backgroundColor: ['rgba(255, 99, 132, 0.2)'],
+                borderColor: ['rgba(255, 99, 132, 1)'],
                 borderWidth: 1
             },
             {
                 label: 'Blue',
-                data: [12, 19, 3, 5, 2, 3],
-                backgroundColor: [
-                    'rgba(99, 99, 255, 0.2)'
-                ],
-                borderColor: [
-                    'rgba(99, 99, 255, 1)'
-                ],
+                data: [11, 27, 10, 8, 3, 10],
+                backgroundColor: ['rgba(99, 99, 255, 0.2)'],
+                borderColor: ['rgba(99, 99, 255, 1)'],
                 borderWidth: 1
             }]
         },
@@ -110,34 +105,105 @@ window.addEventListener('load', function(){
 
     dIndex = -1;
     cIndex = -1;
-    canvas.onmousedown = function(e){
-        ele = myChart.getElementAtEvent(e);
+    setupCanvas.onmousedown = function(e){
+        ele = setupChart.getElementAtEvent(e);
         if (ele.length > 0){
             dIndex = ele[0]._datasetIndex;
             cIndex = ele[0]._index;
-            // clicktxt.innerHTML = "click: data="+ele[0]._datasetIndex+", index="+ele[0]._index;
-        } else {
-            // clicktxt.innerHTML = "click: nothing";
         }
-
-
     }
 
-    canvas.onmouseup = function(e){
-        var yValue = getValueY(e, myChart)
-        // hovertxt.innerHTML = yValue;
-
+    setupCanvas.onmouseup = function(e){
+        var yValue = getValueY(e, setupChart)
         if (dIndex > -1){
-            var data = myChart.data;
+            var data = setupChart.data;
             data.datasets[dIndex].data[cIndex] = yValue;
-            myChart.update();
-            chartdiv.innerHTML = datasetAsHTable(myChart.data);
+            setupChart.update();
+            chartdiv.innerHTML = datasetAsHTable(setupChart.data, true);
             dIndex = -1;
         }
     }
 
+    chartdiv.innerHTML = datasetAsHTable(setupChart.data, true);
+}
 
-    chartdiv.innerHTML = datasetAsHTable(myChart.data);
+var calcChart = null;
+var calcchartdiv = null;
+function createCalcChartAndTable(){
+    var calcCanvas = document.getElementById('calcChart');
+    var calcCtx = calcCanvas.getContext('2d');
+    calcchartdiv = document.getElementById('calcTable');
+    calcChart = new Chart(calcCtx, {
+        type: 'line',
+        data: {
+            labels: ['One', 'Two', 'Three', 'Four', 'Five', 'Six'],
+            datasets: [{
+                label: 'Red',
+                data: [3, 4, 5, 6, 5, 4],
+                backgroundColor: ['rgba(255, 99, 132, 0.2)'],
+                borderColor: ['rgba(255, 99, 132, 1)'],
+                borderWidth: 1
+            },
+            {
+                label: 'Blue',
+                data: [6, 5, 4, 3, 2, 1],
+                backgroundColor: ['rgba(99, 99, 255, 0.2)'],
+                borderColor: ['rgba(99, 99, 255, 1)'],
+                borderWidth: 1
+            },
+            {
+                label: 'Cyan',
+                data: [1, 2, 3, 4, 5, 6],
+                backgroundColor: ['rgba(99, 255, 255, 0.2)'],
+                borderColor: ['rgba(99, 255, 255, 1)'],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            scales: {
+                yAxes: [{
+                    ticks: {
+                        beginAtZero: true
+                    }
+                }]
+            }
+        }
+    });
 
+    calcchartdiv.innerHTML = datasetAsHTable(calcChart.data, false);
+}
+
+function updateCalcGraph(dataset){
+    for (var d=0; d<dataset.length; d++){
+        calcChart.data.datasets[d].data = dataset[d];
+    }
+
+    calcChart.update();
+}
+
+function calcGraph(){
+    body = [];
+    for (var i=0; i<setupChart.data.datasets.length; i++){
+        body.push(setupChart.data.datasets[i].data);
+    }
+
+    $.ajax({
+        url: "/graph/calc",
+        type: "POST",
+        data: JSON.stringify(body),
+        contentType: 'application/json',
+        success: function(response){
+            updateCalcGraph(response);
+            calcchartdiv.innerHTML = datasetAsHTable(calcChart.data, false);
+        }
+    })
+
+}
+
+window.addEventListener('load', function(){
+
+    createSetupChartAndTable();
+
+    createCalcChartAndTable();
 
 })

@@ -5,12 +5,16 @@
     <title>Title</title>
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/chart.css') }}">
     <script src="{{ url_for('static', filename='js/Chart.bundle.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/jquery-3.4.1.min.js') }}"></script>
     <script src="{{ url_for('static', filename='js/chart.js') }}"></script>
 </head>
 <body>
-    <canvas id="myChart" width="300" height="100"></canvas>
-    <div id="theTable"></div>
-    <div id="hovertxt"></div>
-    <div id="clicktxt"></div>
+    <canvas id="setupChart" width="300" height="100"></canvas>
+    <div id="setupTable"></div>
+    <div id="calculate_container">
+        <button type="button" id="calculate_button" onclick="calcGraph()">Calculate</button>
+    </div>
+    <canvas id="calcChart" width="300", height="100"></canvas>
+    <div id="calcTable"></div>
 </body>
 </html>
