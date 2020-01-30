@@ -69,7 +69,20 @@ function datasetAsHTable(dataset, interactable){
 }
 
 function updateDatasetAsHTable(table, dataset, interactable){
+    var values = $(table).find(".table_value");
+    for (var value of values){
+        dIndex = value.getAttribute('dataset');
+        vIndex = value.getAttribute('index');
+        oldValue = value.value;
+        newValue = dataset.datasets[dIndex].data[vIndex].toFixed(3);
+        if (oldValue != newValue){
+            value.value = newValue;
+            value.scrollIntoView();
+            $(value).css("background-color", "rgba(255, 255, 0, 1)");
+            value.setAttribute('fadebackground', '1');
+        }
 
+    }
 }
 
 function changeValue(ele){
@@ -95,7 +108,7 @@ function createSetupChartAndTable(){
             labels: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14],
             datasets: [{
                 label: 'Red',
-                data: [1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+                data: [1.5,2,4,8,6,2,5,6,7,6,4,2,1.5,2],
                 backgroundColor: ['rgba(255, 99, 132, 0.2)'],
                 borderColor: ['rgba(255, 99, 132, 1)'],
                 borderWidth: 1
@@ -135,7 +148,8 @@ function createSetupChartAndTable(){
             var data = setupChart.data;
             data.datasets[dIndex].data[cIndex] = yValue;
             setupChart.update();
-            chartdiv.innerHTML = datasetAsHTable(setupChart.data, true);
+            //chartdiv.innerHTML = datasetAsHTable(setupChart.data, true);
+            updateDatasetAsHTable(chartdiv, setupChart.data, true);
             dIndex = -1;
         }
     }
@@ -155,21 +169,21 @@ function createCalcChartAndTable(){
             labels: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14],
             datasets: [{
                 label: 'Red',
-                data: [],
+                data: [0,0,0,0,0,0,0,0,0,0,0,0,0,0],
                 backgroundColor: ['rgba(255, 99, 132, 0.2)'],
                 borderColor: ['rgba(255, 99, 132, 1)'],
                 borderWidth: 1
             },
             {
                 label: 'Blue',
-                data: [],
+                data: [0,0,0,0,0,0,0,0,0,0,0,0,0,0],
                 backgroundColor: ['rgba(99, 99, 255, 0.2)'],
                 borderColor: ['rgba(99, 99, 255, 1)'],
                 borderWidth: 1
             },
             {
                 label: 'Cyan',
-                data: [],
+                data: [0,0,0,0,0,0,0,0,0,0,0,0,0,0],
                 backgroundColor: ['rgba(99, 255, 255, 0.2)'],
                 borderColor: ['rgba(99, 255, 255, 1)'],
                 borderWidth: 1
@@ -221,5 +235,22 @@ window.addEventListener('load', function(){
     createSetupChartAndTable();
 
     createCalcChartAndTable();
+
+    window.setInterval(function(){
+        var fadecells = $(".table_value[fadebackground]");
+        //console.log('fade');
+        for (var cell of fadecells){
+            //console.log('a cell in fade');
+            var alpha = parseFloat(cell.getAttribute('fadebackground'));
+            alpha -= 0.1;
+            if (alpha < 0) alpha = 0;
+            $(cell).css("background-color", "rgba(255, 255, 0, "+alpha+")");
+            if (alpha == 0){
+                cell.removeAttribute('fadebackground');
+            } else {
+                cell.setAttribute('fadebackground', alpha);
+            }
+        }
+    }, 200);
 
 })
