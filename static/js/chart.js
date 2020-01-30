@@ -26,8 +26,18 @@ function getValueY(e, chart){
 }
 
 function datasetAsHTable(dataset, interactable){
-    var html = '<table class="table_tag">';
-    html += '<tr> <th>#</th>';
+    var html = '<div class="table_container">';
+    html += '<div class="table_row_header">';
+    html += '<table class="table_tag">';
+    html += '<tr> <th>#</th> </tr>';
+    for (var item of dataset.datasets){
+        html += '<tr style="background-color: '+item.backgroundColor+'" class="table_row"><td class="table_rowHeader">'+item.label+'</td></tr>'; // row header
+    }
+    html += '</table>';
+    html += '</div>';
+
+    html += '<div class="table_data_container">';
+    html += '<table class="table_tag">';
 
     var columnCount = 0;
     for (var item of dataset.labels){
@@ -37,13 +47,13 @@ function datasetAsHTable(dataset, interactable){
 
     var idx = 0;
     for (var item of dataset.datasets){
-        html += '<tr style="background-color: '+item.backgroundColor+'" class="table_row"><td class="table_rowHeader">'+item.label+'</td>'; // row header
+        html += '<tr style="background-color: '+item.backgroundColor+'" class="table_row">'; // row header
         for (i=0; i<columnCount; i++){
             value = dataset.datasets[idx].data[i]
             if (interactable){
-                html += '<td class="table_valueContainer"><input class="table_valueInput" onkeydown="changeValue(this)" type="text" dataset="'+idx+'" index="'+i+'" value="'+value.toFixed(3)+'"></td>';
+                html += '<td class="table_valueContainer"><input class="table_value input" onkeydown="changeValue(this)" type="text" dataset="'+idx+'" index="'+i+'" value="'+value.toFixed(3)+'"></td>';
             } else {
-                html += '<td class="table_valueContainer">'+value.toFixed(3)+'</td>';
+                html += '<td class="table_valueContainer"><div class="table_value fixed" dataset="'+idx+'" index="'+i+'">'+value.toFixed(3)+'</div></td>';
             }
 
         }
@@ -53,7 +63,13 @@ function datasetAsHTable(dataset, interactable){
 
     html += '</tr>';
     html += '</table>';
+    html += '</div>';
+    html += '</div>';
     return html;
+}
+
+function updateDatasetAsHTable(table, dataset, interactable){
+
 }
 
 function changeValue(ele){
@@ -76,17 +92,17 @@ function createSetupChartAndTable(){
     setupChart = new Chart(setupCtx, {
         type: 'line',
         data: {
-            labels: ['One', 'Two', 'Three', 'Four', 'Five', 'Six'],
+            labels: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14],
             datasets: [{
                 label: 'Red',
-                data: [15, 19, 3, 5, 5, 3],
+                data: [1,1,1,1,1,1,1,1,1,1,1,1,1,1],
                 backgroundColor: ['rgba(255, 99, 132, 0.2)'],
                 borderColor: ['rgba(255, 99, 132, 1)'],
                 borderWidth: 1
             },
             {
                 label: 'Blue',
-                data: [11, 27, 10, 8, 3, 10],
+                data: [1,1,1,1,1,1,1,1,1,1,1,1,1,1],
                 backgroundColor: ['rgba(99, 99, 255, 0.2)'],
                 borderColor: ['rgba(99, 99, 255, 1)'],
                 borderWidth: 1
@@ -136,24 +152,24 @@ function createCalcChartAndTable(){
     calcChart = new Chart(calcCtx, {
         type: 'line',
         data: {
-            labels: ['One', 'Two', 'Three', 'Four', 'Five', 'Six'],
+            labels: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14],
             datasets: [{
                 label: 'Red',
-                data: [3, 4, 5, 6, 5, 4],
+                data: [],
                 backgroundColor: ['rgba(255, 99, 132, 0.2)'],
                 borderColor: ['rgba(255, 99, 132, 1)'],
                 borderWidth: 1
             },
             {
                 label: 'Blue',
-                data: [6, 5, 4, 3, 2, 1],
+                data: [],
                 backgroundColor: ['rgba(99, 99, 255, 0.2)'],
                 borderColor: ['rgba(99, 99, 255, 1)'],
                 borderWidth: 1
             },
             {
                 label: 'Cyan',
-                data: [1, 2, 3, 4, 5, 6],
+                data: [],
                 backgroundColor: ['rgba(99, 255, 255, 0.2)'],
                 borderColor: ['rgba(99, 255, 255, 1)'],
                 borderWidth: 1

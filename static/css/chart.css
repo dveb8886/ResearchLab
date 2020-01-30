@@ -16,16 +16,19 @@
 }
 
 .table_valueContainer {
-    width: 70px;
     text-align: right;
 }
 
-.table_valueInput {
+.table_value.input {
     width: 70px;
     text-align: right;
     margin-right: 1px;
     background-color: rgba(0,0,0,0);
     border-style: none;
+}
+
+.table_value.fixed {
+    width: 70px;
 }
 
 #calculate_container {
@@ -36,4 +39,17 @@
 
 #calculate_button {
 
+}
+
+.table_container {
+    display: flex;
+}
+
+.table_row_header {
+
+}
+
+.table_data_container {
+    overflow: auto;
+    flex: 1;
 }
