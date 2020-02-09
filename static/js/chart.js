@@ -1,22 +1,15 @@
 
-var cache = []
-function checkdupes(key, value){
-    if (typeof value === 'object' && value !== null) {
-        if (cache.indexOf(value) !== -1) {
-            // Circular reference found, discard key
-            return;
-        }
-        // Store value in our collection
-        cache.push(value);
-    }
-    return value;
-}
-
-// map value to other coordinate system
+/**
+ * Utility function for transforming a value from one coordinate scale to another
+ */
 function map(value, start1, stop1, start2, stop2) {
     return start2 + (stop2 - start2) * ((value - start1) / (stop1 - start1))
 }
 
+/**
+ * This function takes the location of a mouse click within a graph, and returns the
+ *  in-graph y-coordinate of that mouse click
+ */
 function getValueY(e, chart){
     const helpers = Chart.helpers;
     var pos = helpers.getRelativePosition(e, chart);
@@ -25,11 +18,20 @@ function getValueY(e, chart){
     return map(pos.y, chartArea.bottom, chartArea.top, yAxis.min, yAxis.max);
 }
 
+/**
+ * This function creates a table based on a dataset
+ */
 function datasetAsHTable(dataset, interactable){
     var html = '<div class="table_container">';
     html += '<div class="table_row_header">';
     html += '<table class="table_tag">';
-    html += '<tr> <th>#</th> </tr>';
+    count = dataset.labels.length;
+    if (interactable){
+        html += '<tr> <th><input onkeydown="resizeSetupGraph(this)" class="table_size input" value="'+count+'" /></th> </tr>';
+    } else {
+        html += '<tr> <th>['+count+']</th> </tr>';
+    }
+
     for (var item of dataset.datasets){
         html += '<tr style="background-color: '+item.backgroundColor+'" class="table_row"><td class="table_rowHeader">'+item.label+'</td></tr>'; // row header
     }
@@ -68,6 +70,9 @@ function datasetAsHTable(dataset, interactable){
     return html;
 }
 
+/**
+ * This function updates the dataset within an already existing table
+ */
 function updateDatasetAsHTable(table, dataset, interactable){
     var values = $(table).find(".table_value");
     for (var value of values){
@@ -85,6 +90,10 @@ function updateDatasetAsHTable(table, dataset, interactable){
     }
 }
 
+/**
+ * This function executes when you change the numbers directly in the top table
+ * Such a change results in the top graph updating
+ */
 function changeValue(ele){
     if (event.key === 'Enter' || event.key === 'Tab'){
         var data = setupChart.data;
@@ -98,6 +107,39 @@ function changeValue(ele){
 
 var setupChart = null;
 var chartdiv = null;
+
+/**
+ * This function executes when you change the number in the size field of the table
+ * It will resize the horizontal size of that table to that size
+ */
+function resizeSetupGraph(ele){
+    if (event.key === 'Enter' || event.key === 'Tab'){
+        var data = setupChart.data;
+        count = ele.value;
+        data.labels.length = count;
+        for (var d=0; d<data.datasets.length; d++){
+            data.datasets[d].data.length = count
+        }
+        for (var i=0; i<count; i++){
+            data.labels[i] = (i+1);
+            for (var d=0; d<data.datasets.length; d++){
+                var value = data.datasets[d].data[i];
+                if (value == undefined){
+                    data.datasets[d].data[i] = 0;
+                }
+            }
+        }
+//        alert(data.labels);
+//        alert(data.datasets[0].data);
+
+        chartdiv.innerHTML = datasetAsHTable(data, true);
+        setupChart.update();
+    }
+}
+
+/**
+ * This function generates the top graph with some random predetermined values
+ */
 function createSetupChartAndTable(){
     var setupCanvas = document.getElementById('setupChart');
     var setupCtx = setupCanvas.getContext('2d');
@@ -157,8 +199,13 @@ function createSetupChartAndTable(){
     chartdiv.innerHTML = datasetAsHTable(setupChart.data, true);
 }
 
+
 var calcChart = null;
 var calcchartdiv = null;
+
+/**
+ * This function generates the bottom graph with default (all 0) values
+ */
 function createCalcChartAndTable(){
     var calcCanvas = document.getElementById('calcChart');
     var calcCtx = calcCanvas.getContext('2d');
@@ -203,7 +250,14 @@ function createCalcChartAndTable(){
     calcchartdiv.innerHTML = datasetAsHTable(calcChart.data, false);
 }
 
+/**
+ * This function updates the bottom graph with the given dataset values
+ */
 function updateCalcGraph(dataset){
+    calcChart.data.labels.length = dataset[0].length;
+    for (var i=0; i<count; i++){
+        calcChart.data.labels[i] = (i+1);
+    }
     for (var d=0; d<dataset.length; d++){
         calcChart.data.datasets[d].data = dataset[d];
     }
@@ -211,6 +265,11 @@ function updateCalcGraph(dataset){
     calcChart.update();
 }
 
+/**
+ * This function is executed by the "Calculate" button.
+ * It takes the data from the top table, and sends it to the server
+ * The server then responds with calculated data, which is applied to the bottom chart
+ */
 function calcGraph(){
     body = [];
     for (var i=0; i<setupChart.data.datasets.length; i++){
@@ -218,7 +277,7 @@ function calcGraph(){
     }
 
     $.ajax({
-        url: "/graph/calc",
+        url: "/fund/calc",
         type: "POST",
         data: JSON.stringify(body),
         contentType: 'application/json',
@@ -230,12 +289,16 @@ function calcGraph(){
 
 }
 
+// Runs when the page is fully loaded
 window.addEventListener('load', function(){
 
+    // Generates the top chart
     createSetupChartAndTable();
 
+    // Generates the bottom chart
     createCalcChartAndTable();
 
+    // Interval: creates the fading highlight effect on recently updated cells
     window.setInterval(function(){
         var fadecells = $(".table_value[fadebackground]");
         //console.log('fade');

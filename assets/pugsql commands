@@ -1,0 +1,7 @@
+import pugsql
+queries = pugsql.module('assets/sql')
+queries.connect('sqlite:///memory')
+queries.createtable_user()
+queries.create_user(user_id=0, first_name='Test', last_name='Test')
+user = queries.find_user(user_id=0)
+print(user)
