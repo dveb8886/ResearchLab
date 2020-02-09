@@ -9,7 +9,19 @@
     <!--<script src="{{ url_for('static', filename='js/chart.js') }}"></script>-->
 </head>
 <body>
-    {{ org }}
-    {{ profiles }}
+    <h1>{{ org.org_name }}</h1>
+    <h4>Profiles</h4>
+    <div>
+        <ol>
+        {% for profile in profiles %}
+            <li><a href="{{ url_for('profile_api.prof', prof_id=profile.id) }}">{{ profile.prof_name }}</a></li>
+        {% endfor %}
+        </ol>
+        <form action="{{ url_for('profile_api.add') }}" method="post">
+            <input name="prof_name" />
+            <input name="org_id" hidden="true" value="{{ org.id }}" />
+            <button>Add Profile</button>
+        </form>
+    </div>
 </body>
 </html>

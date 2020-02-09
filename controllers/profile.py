@@ -10,3 +10,7 @@ class ProfileController():
         prof = Profile.find(prof_id)
         funds = Fund.list(prof_id)
         return prof, list(funds)
+
+    def addProf(self, prof_name, org_id):
+        prof = Profile.add(prof_name, org_id)
+        return prof

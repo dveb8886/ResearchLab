@@ -18,6 +18,12 @@ class FundController():
             'org_name': organization.org_name
         }
 
+    def addFund(self, fund_name, org_id):
+        fund = Fund.add(fund_name, org_id)
+        return fund
+
+    # dataset = [[#, #, #, #], [#, #, #, #]]
+    # return  = [[#, #, #, #], [#, #, #, #], [#, #, #, #]]
     def calcGraph(self, dataset):
         redTotal = 0
         red = []

@@ -5,6 +5,17 @@
     <title>Home</title>
 </head>
 <body>
-    {{ orgs }}
+    <h4>Organizations</h4>
+    <div>
+        <ol>
+        {% for org in orgs %}
+            <li><a href="{{ url_for('organization_api.org', org_id=org.id) }}">{{ org.org_name }}</a></li>
+        {% endfor %}
+        </ol>
+        <form action="{{ url_for('organization_api.add') }}" method="post">
+            <input name="org_name"/>
+            <button>Add Organization</button>
+        </form>
+    </div>
 </body>
 </html>
