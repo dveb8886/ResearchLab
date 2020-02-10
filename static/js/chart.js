@@ -148,11 +148,11 @@ function createSetupChartAndTable(){
         labels: loaddata['x'],
         datasets: []
     };
-    for (let stat in loaddata['y']){
+    for (let stat in loaddata['stats']){
         if (loaddata['stats_controlled'].includes(stat)){
-            dataset = {label: stat, data: loaddata['y'][stat]};
-            dataset['backgroundColor'] = ['rgba(255, 99, 132, 0.2)'];
-            dataset['borderColor'] = ['rgba(255, 99, 132, 1)'];
+            dataset = {label: stat, data: loaddata['stats'][stat]['y']};
+            dataset['backgroundColor'] = [loaddata['stats'][stat]['color_fill']];
+            dataset['borderColor'] = [loaddata['stats'][stat]['color_line']];
             dataset['borderWidth'] = 1
             data['datasets'].push(dataset);
         }
@@ -211,11 +211,11 @@ function createCalcChartAndTable(){
         labels: loaddata['x'],
         datasets: []
     };
-    for (let stat in loaddata['y']){
+    for (let stat in loaddata['stats']){
         if (!loaddata['stats_controlled'].includes(stat)){
-            dataset = {label: stat, data: loaddata['y'][stat]};
-            dataset['backgroundColor'] = ['rgba(255, 99, 132, 0.2)'];
-            dataset['borderColor'] = ['rgba(255, 99, 132, 1)'];
+            dataset = {label: stat, data: loaddata['stats'][stat]['y']};
+            dataset['backgroundColor'] = [loaddata['stats'][stat]['color_fill']];
+            dataset['borderColor'] = [loaddata['stats'][stat]['color_line']];
             dataset['borderWidth'] = 1
             data['datasets'].push(dataset);
         }
@@ -243,10 +243,10 @@ function createCalcChartAndTable(){
 function updateCalcGraph(ds){
     calcChart.data.labels = ds['x'];
     calcChart.data.datasets = [];
-    for (let stat in ds['y']){
-        dataset = {label: stat, data: ds['y'][stat]};
-        dataset['backgroundColor'] = ['rgba(255, 99, 132, 0.2)'];
-        dataset['borderColor'] = ['rgba(255, 99, 132, 1)'];
+    for (let stat in ds['stats']){
+        dataset = {label: stat, data: ds['stats'][stat]['y']};
+        dataset['backgroundColor'] = [ds['stats'][stat]['color_fill']];
+        dataset['borderColor'] = [ds['stats'][stat]['color_line']];
         dataset['borderWidth'] = 1
         calcChart.data.datasets.push(dataset);
     };
@@ -260,10 +260,12 @@ function updateCalcGraph(ds){
  * The server then responds with calculated data, which is applied to the bottom chart
  */
 function calcGraph(){
-    body = {fund: loaddata['fund'], x: setupChart.data.labels, y:{}};
+    body = {fund: loaddata['fund'], x: setupChart.data.labels, stats:{}};
     for (var i=0; i<setupChart.data.datasets.length; i++){
-        body['y'][setupChart.data.datasets[i].label] = setupChart.data.datasets[i].data;
-    }
+        body['stats'][setupChart.data.datasets[i].label] = {
+            y: setupChart.data.datasets[i].data
+        }
+    };
 
     $.ajax({
         url: "/fund/calc",
@@ -274,7 +276,7 @@ function calcGraph(){
             updateCalcGraph(response);
             calcchartdiv.innerHTML = datasetAsHTable(calcChart.data, false);
         }
-    })
+    });
 
 }
 
@@ -284,12 +286,16 @@ function calcGraph(){
  * the server will save these values to the database, when the page refresh the data will be retained
  */
 function commitGraph(){
-    body = {fund: loaddata['fund'], x: setupChart.data.labels, y:{}};
+    body = {fund: loaddata['fund'], x: setupChart.data.labels, stats:{}};
     for (var i=0; i<setupChart.data.datasets.length; i++){
-        body['y'][setupChart.data.datasets[i].label] = setupChart.data.datasets[i].data;
+        body['stats'][setupChart.data.datasets[i].label] = {
+            y: setupChart.data.datasets[i].data
+        }
     }
     for (var i=0; i<calcChart.data.datasets.length; i++){
-        body['y'][calcChart.data.datasets[i].label] = calcChart.data.datasets[i].data;
+        body['stats'][calcChart.data.datasets[i].label] = {
+            y: calcChart.data.datasets[i].data
+        }
     }
     $.ajax({
         url: "/fund/commit",

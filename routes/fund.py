@@ -13,7 +13,7 @@ def fund(fund_id):
                            prof_name=answers['prof_name'],
                            org_name=answers['org_name'],
                            x=answers['x'],
-                           y=answers['y'],
+                           stats=answers['stats'],
                            stats_controlled=answers['stats_controlled']
     )
 

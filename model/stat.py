@@ -6,6 +6,8 @@ class Stat:
         self.id = field_dict["id"]
         self.fund = field_dict["fund"]
         self.stat_name = field_dict["stat_name"]
+        self.color_line = field_dict["color_line"]
+        self.color_fill = field_dict["color_fill"]
         if values == None:
             self.values = [[], []]
         elif values == 'db':
@@ -35,6 +37,19 @@ class Stat:
     def get_y(self, index):
         return self.values[1][index]
 
+    def commit(self):
+        params = {
+            'stat_id': self.id,
+            'stat_name': self.stat_name,
+            'color_line': self.color_line,
+            'color_fill': self.color_fill
+        }
+        settings.sql.stat_update(**params)
+
+    def set_color(self, r, g, b):
+        self.color_line = 'rgba({}, {}, {}, {})'.format(r, g, b, '1.0')
+        self.color_fill = 'rgba({}, {}, {}, {})'.format(r, g, b, '0.2')
+
     # updates the local value, but not the database
     def set_values(self, values):
         # validation
@@ -58,7 +73,10 @@ class Stat:
         if not result == None:
             raise ValueError('this fund already has a stat called '+stat_name)
         id = settings.sql.stat_add(stat_name=stat_name, fund=fund)
-        return Stat.find(id)
+        stat = Stat.find(id)
+        stat.set_color(0, 0, 0)
+        stat.commit()
+        return stat
 
     @staticmethod
     def find(stat_id):

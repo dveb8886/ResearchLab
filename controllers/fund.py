@@ -2,6 +2,7 @@ from model.organization import Organization
 from model.profile import Profile
 from model.fund import Fund
 from model.stat import Stat
+import general.settings as settings
 
 class FundController():
 
@@ -19,12 +20,23 @@ class FundController():
         x = None
         for stat_name in stats_controlled+stats_calculated:
             stat = Stat.find_by_name(stat_name, fund_id, 'db')
+
             if not stat == None:
-                stats[stat.stat_name] = stat.get_values()[1]
+                stats[stat_name] = {
+                    'y': stat.get_values()[1],
+                    # 'color_line': stat.color_line,
+                    # 'color_fill': stat.color_fill
+                    'color_line': settings.colors[stat_name]['color_line'],
+                    'color_fill': settings.colors[stat_name]['color_fill']
+                }
                 if x == None:
                     x = stat.get_values()[0]
             elif stat_name in stats_controlled:
-                stats[stat_name] = [1 for x in range(6)]
+                stats[stat_name] = {
+                    'y': [1 for x in range(6)],
+                    'color_line': settings.colors[stat_name]['color_line'],
+                    'color_fill': settings.colors[stat_name]['color_fill']
+                }
                 if x == None:
                     x = [x for x in range(6)]
 
@@ -34,7 +46,7 @@ class FundController():
             'prof_name': profile.prof_name,
             'org_name': organization.org_name,
             'x': x,
-            'y': stats,
+            'stats': stats,
             'stats_controlled': stats_controlled
         }
 
@@ -43,16 +55,20 @@ class FundController():
         fund = Fund.add(fund_name, org_id)
         x = [1,2,3,4,5,6]
         stat_red = Stat.add('Red', fund.id)
-        stat_red.set_values([x, [1,2,3,2,4,5]])
+        stat_red.set_values([x, [1,1,1,1,1,1]])
         stat_red.commit_values()
         stat_blue = Stat.add('Blue', fund.id)
-        stat_blue.set_values([x, [5,4,3,2,1,3]])
+        stat_blue.set_values([x, [1,1,1,1,1,1]])
         stat_blue.commit_values()
         return fund
 
     # this function runs when the "Calculate" button is pressed on the UI.
-    # sample dataset = {fund: #, x: [x1, x2], y:{'Red':[y1, y2], 'Blue':[y1, y2]}}
-    # expected return =  {fund: #, x: [x1, x2], y:{'Cyan':[y1, y2], 'Purple':[y1, y2], 'Orange':[y1, y2]}}
+    # sample dataset = {fund: #, x: [x1, x2], stats:{'Red':{y:[y1, y2]}, 'Blue':{y:[y1, y2]}}}
+    # expected return =  {fund: #, x: [x1, x2], stats:{
+    #                       'Cyan':  {y:[y1, y2], color_line:'rgba(#, #, #, #)', color_fill:'rgba(#, #, #, #)'},
+    #                       'Purple':{y:[y1, y2], color_line:'rgba(#, #, #, #)', color_fill:'rgba(#, #, #, #)'},
+    #                       'Orange':{y:[y1, y2], color_line:'rgba(#, #, #, #)', color_fill:'rgba(#, #, #, #)'}
+    #                    }}
     def calcGraph(self, dataset):
         x = dataset['x']
         fund = dataset['fund']
@@ -65,25 +81,38 @@ class FundController():
         orange = []
 
         for i in range (len(x)):
-            purpleTotal += dataset['y']['Red'][i]
+            purpleTotal += dataset['stats']['Red']['y'][i]
             purple.append(purpleTotal)
-            orangeTotal += dataset['y']['Blue'][i]
+            orangeTotal += dataset['stats']['Blue']['y'][i]
             orange.append(orangeTotal)
-            cyanTotal += (dataset['y']['Red'][i] + dataset['y']['Blue'][i])
+            cyanTotal += (dataset['stats']['Red']['y'][i] + dataset['stats']['Blue']['y'][i])
             cyan.append(cyanTotal)
 
-        return {'fund': fund, 'x': x, 'y':{'Cyan': cyan, 'Purple': purple, 'Orange': orange}}
+        return {'fund': fund, 'x': x, 'stats':{
+            'Cyan': {'y':cyan, 'color_line': settings.colors['Cyan']['color_line'], 'color_fill': settings.colors['Cyan']['color_fill']},
+            'Purple': {'y':purple, 'color_line': settings.colors['Purple']['color_line'], 'color_fill': settings.colors['Purple']['color_fill']},
+            'Orange': {'y':orange, 'color_line': settings.colors['Orange']['color_line'], 'color_fill': settings.colors['Orange']['color_fill']}
+        }}
 
     # this function runs when the "Commit" button is pressed on the UI
-    # dataset = {fund: #, x:[x1, x2], y:{'Red':[y1, y2], 'Blue':[y1, y2], 'Cyan':[y1, y2], 'Purple':[y1, y2], 'Orange':[y1, y2]}}
+    # dataset = {fund: #, x:[x1, x2], stats:{
+    #               'Red'   :{y:[y1, y2]},
+    #               'Blue'  :{y:[y1, y2]},
+    #               'Cyan'  :{y:[y1, y2]},
+    #               'Purple':{y:[y1, y2]},
+    #               'Orange':{y:[y1, y2]}
+    # }}
     def commitGraph(self, dataset):
         x = dataset['x']
         fund = dataset['fund']
-        stats_json = dataset['y']
+        stats_json = dataset['stats']
         for stat_name, stat_values in stats_json.items():
-            stat = Stat.find_by_name(stat_name, fund, [x, stat_values])
+            stat = Stat.find_by_name(stat_name, fund, [x, stat_values['y']])
             if stat == None: # create the stat in the database if it doesn't exist
                 stat = Stat.add(stat_name, fund)
-                stat.set_values([x, stat_values])
+                stat.set_values([x, stat_values['y']])
+                stat.color_line = settings.colors[stat_name]['color_line']
+                stat.color_fill = settings.colors[stat_name]['color_fill']
+            stat.commit()
             stat.commit_values()
         return 'success'
