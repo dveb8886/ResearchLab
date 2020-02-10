@@ -144,25 +144,22 @@ function createSetupChartAndTable(){
     var setupCanvas = document.getElementById('setupChart');
     var setupCtx = setupCanvas.getContext('2d');
     chartdiv = document.getElementById('setupTable');
+    data = {
+        labels: loaddata['x'],
+        datasets: []
+    };
+    for (let stat in loaddata['y']){
+        if (loaddata['stats_controlled'].includes(stat)){
+            dataset = {label: stat, data: loaddata['y'][stat]};
+            dataset['backgroundColor'] = ['rgba(255, 99, 132, 0.2)'];
+            dataset['borderColor'] = ['rgba(255, 99, 132, 1)'];
+            dataset['borderWidth'] = 1
+            data['datasets'].push(dataset);
+        }
+    };
     setupChart = new Chart(setupCtx, {
         type: 'line',
-        data: {
-            labels: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14],
-            datasets: [{
-                label: 'Red',
-                data: [1.5,2,4,8,6,2,5,6,7,6,4,2,1.5,2],
-                backgroundColor: ['rgba(255, 99, 132, 0.2)'],
-                borderColor: ['rgba(255, 99, 132, 1)'],
-                borderWidth: 1
-            },
-            {
-                label: 'Blue',
-                data: [1,1,1,1,1,1,1,1,1,1,1,1,1,1],
-                backgroundColor: ['rgba(99, 99, 255, 0.2)'],
-                borderColor: ['rgba(99, 99, 255, 1)'],
-                borderWidth: 1
-            }]
-        },
+        data: data,
         options: {
             scales: {
                 yAxes: [{
@@ -210,32 +207,22 @@ function createCalcChartAndTable(){
     var calcCanvas = document.getElementById('calcChart');
     var calcCtx = calcCanvas.getContext('2d');
     calcchartdiv = document.getElementById('calcTable');
+    data = {
+        labels: loaddata['x'],
+        datasets: []
+    };
+    for (let stat in loaddata['y']){
+        if (!loaddata['stats_controlled'].includes(stat)){
+            dataset = {label: stat, data: loaddata['y'][stat]};
+            dataset['backgroundColor'] = ['rgba(255, 99, 132, 0.2)'];
+            dataset['borderColor'] = ['rgba(255, 99, 132, 1)'];
+            dataset['borderWidth'] = 1
+            data['datasets'].push(dataset);
+        }
+    };
     calcChart = new Chart(calcCtx, {
         type: 'line',
-        data: {
-            labels: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14],
-            datasets: [{
-                label: 'Red',
-                data: [0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-                backgroundColor: ['rgba(255, 99, 132, 0.2)'],
-                borderColor: ['rgba(255, 99, 132, 1)'],
-                borderWidth: 1
-            },
-            {
-                label: 'Blue',
-                data: [0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-                backgroundColor: ['rgba(99, 99, 255, 0.2)'],
-                borderColor: ['rgba(99, 99, 255, 1)'],
-                borderWidth: 1
-            },
-            {
-                label: 'Cyan',
-                data: [0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-                backgroundColor: ['rgba(99, 255, 255, 0.2)'],
-                borderColor: ['rgba(99, 255, 255, 1)'],
-                borderWidth: 1
-            }]
-        },
+        data: data,
         options: {
             scales: {
                 yAxes: [{
@@ -253,14 +240,16 @@ function createCalcChartAndTable(){
 /**
  * This function updates the bottom graph with the given dataset values
  */
-function updateCalcGraph(dataset){
-    calcChart.data.labels.length = dataset[0].length;
-    for (var i=0; i<count; i++){
-        calcChart.data.labels[i] = (i+1);
-    }
-    for (var d=0; d<dataset.length; d++){
-        calcChart.data.datasets[d].data = dataset[d];
-    }
+function updateCalcGraph(ds){
+    calcChart.data.labels = ds['x'];
+    calcChart.data.datasets = [];
+    for (let stat in ds['y']){
+        dataset = {label: stat, data: ds['y'][stat]};
+        dataset['backgroundColor'] = ['rgba(255, 99, 132, 0.2)'];
+        dataset['borderColor'] = ['rgba(255, 99, 132, 1)'];
+        dataset['borderWidth'] = 1
+        calcChart.data.datasets.push(dataset);
+    };
 
     calcChart.update();
 }
@@ -271,9 +260,9 @@ function updateCalcGraph(dataset){
  * The server then responds with calculated data, which is applied to the bottom chart
  */
 function calcGraph(){
-    body = [];
+    body = {fund: loaddata['fund'], x: setupChart.data.labels, y:{}};
     for (var i=0; i<setupChart.data.datasets.length; i++){
-        body.push(setupChart.data.datasets[i].data);
+        body['y'][setupChart.data.datasets[i].label] = setupChart.data.datasets[i].data;
     }
 
     $.ajax({
@@ -287,6 +276,30 @@ function calcGraph(){
         }
     })
 
+}
+
+/**
+ * This function is executed by the "Commit" button.
+ * It takes the data from both tables, and sends it to the server
+ * the server will save these values to the database, when the page refresh the data will be retained
+ */
+function commitGraph(){
+    body = {fund: loaddata['fund'], x: setupChart.data.labels, y:{}};
+    for (var i=0; i<setupChart.data.datasets.length; i++){
+        body['y'][setupChart.data.datasets[i].label] = setupChart.data.datasets[i].data;
+    }
+    for (var i=0; i<calcChart.data.datasets.length; i++){
+        body['y'][calcChart.data.datasets[i].label] = calcChart.data.datasets[i].data;
+    }
+    $.ajax({
+        url: "/fund/commit",
+        type: "POST",
+        data: JSON.stringify(body),
+        contentType: 'application/json',
+        success: function(response){
+
+        }
+    })
 }
 
 // Runs when the page is fully loaded

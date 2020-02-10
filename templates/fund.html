@@ -8,12 +8,21 @@
     <script src="{{ url_for('static', filename='js/jquery-3.4.1.min.js') }}"></script>
     <script src="{{ url_for('static', filename='js/chart.js') }}"></script>
 </head>
+<script>
+    loaddata = {
+        fund: {{ fund|safe }},
+        x: {{ x|safe }},
+        y: {{ y|safe }},
+        stats_controlled: {{ stats_controlled|safe }}
+    }
+</script>
 <body>
     <h4>{{ org_name }} > {{ prof_name }} > {{ fund_name }}</h4>
     <canvas id="setupChart" width="300" height="100"></canvas>
     <div id="setupTable"></div>
     <div id="calculate_container">
         <button type="button" id="calculate_button" onclick="calcGraph()">Calculate</button>
+        <button type="button" id="commit_button" onclick="commitGraph()">Commit</button>
     </div>
     <canvas id="calcChart" width="300", height="100"></canvas>
     <div id="calcTable"></div>

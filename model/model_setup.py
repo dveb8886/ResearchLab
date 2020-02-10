@@ -4,6 +4,7 @@ import general.settings as settings
 def init():
     handler = pugsql.module('assets/sql')
     handler.connect('sqlite:///memory')
+    settings.sql = handler
 
     # Create table if they don't exist
     handler.org_create()
@@ -22,6 +23,4 @@ def init():
         handler.fund_add(id=1, fund_name='Test Fund', prof=1)
 
     # return the queries handler
-
-    settings.sql = handler
     return handler

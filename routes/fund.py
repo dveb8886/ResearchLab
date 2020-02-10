@@ -8,9 +8,13 @@ controller = FundController()
 def fund(fund_id):
     answers = controller.renderFund(fund_id)
     return render_template('fund.html',
-           fund_name=answers['fund_name'],
-           prof_name=answers['prof_name'],
-           org_name=answers['org_name']
+                           fund_name=answers['fund_name'],
+                           fund=answers['fund'],
+                           prof_name=answers['prof_name'],
+                           org_name=answers['org_name'],
+                           x=answers['x'],
+                           y=answers['y'],
+                           stats_controlled=answers['stats_controlled']
     )
 
 @fund_api.route('/add', methods=['post'])
@@ -20,6 +24,10 @@ def add():
     controller.addFund(fund_name, prof_id)
     return redirect(url_for('profile_api.prof', prof_id=prof_id))
 
-@fund_api.route('/calc', methods=["POST"])
+@fund_api.route('/calc', methods=["post"])
 def graph_calc():
     return jsonify(controller.calcGraph(request.json))
+
+@fund_api.route('/commit', methods=["post"])
+def commit_graph():
+    return jsonify(controller.commitGraph(request.json))

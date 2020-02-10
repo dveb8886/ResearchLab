@@ -1,3 +1,4 @@
 -- :name stat_readvalues :many
-select * from value
-where stat = :stat_id;
+select x_date, y_value from value
+where stat = :stat_id
+order by x_date;
