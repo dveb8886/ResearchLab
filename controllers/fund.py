@@ -3,6 +3,7 @@ from model.profile import Profile
 from model.fund import Fund
 from model.stat import Stat
 import general.settings as settings
+import math
 
 class FundController():
 
@@ -13,12 +14,15 @@ class FundController():
         fund = Fund.find(fund_id)
         profile = Profile.find(fund.prof)
         organization = Organization.find(profile.org)
-        stats_controlled = ['Red', 'Blue'] # these stats show up in the top graph
-        stats_calculated = ['Cyan', 'Purple', 'Orange'] # these stats show up in the bottom graph
+        stats_beta = ['Beta']  # these stats show up in the top graph
+        stats_controlled = ['Alpha', 'RM', 'RF']  # these stats show up in the top graph
+        stats_curves = ['c_rate', 'd_rate']  # these stats show up in the top graph
+        stats_calculated = ['growth_rate', 'NAV', 'Unfunded'] # these stats show up in the bottom graph
+
 
         stats = {}
         x = None
-        for stat_name in stats_controlled+stats_calculated:
+        for stat_name in stats_beta+stats_controlled+stats_curves+stats_calculated:
             stat = Stat.find_by_name(stat_name, fund_id, 'db')
 
             if not stat == None:
@@ -31,7 +35,8 @@ class FundController():
                 }
                 if x == None:
                     x = stat.get_values()[0]
-            elif stat_name in stats_controlled:
+
+            elif stat_name in stats_controlled+stats_beta+stats_curves:
                 stats[stat_name] = {
                     'y': [1 for x in range(6)],
                     'color_line': settings.colors[stat_name]['color_line'],
@@ -40,6 +45,7 @@ class FundController():
                 if x == None:
                     x = [x for x in range(6)]
 
+
         return {
             'fund_name': fund.fund_name,
             'fund': fund_id,
@@ -47,19 +53,42 @@ class FundController():
             'org_name': organization.org_name,
             'x': x,
             'stats': stats,
+            'stats_beta': stats_beta,
+            'stats_curves': stats_curves,
             'stats_controlled': stats_controlled
         }
 
     # This function creates a new fund with default stats
     def addFund(self, fund_name, org_id):
+        print("adding new fund")
         fund = Fund.add(fund_name, org_id)
         x = [1,2,3,4,5,6]
-        stat_red = Stat.add('Red', fund.id)
-        stat_red.set_values([x, [1,1,1,1,1,1]])
-        stat_red.commit_values()
-        stat_blue = Stat.add('Blue', fund.id)
-        stat_blue.set_values([x, [1,1,1,1,1,1]])
-        stat_blue.commit_values()
+
+        stat_beta = Stat.add('Beta', fund.id)
+        stat_beta.set_values([x, [1.26,5.34,1.26,1.26,1.26,1.26]])
+        stat_beta.commit_values()
+
+        stat_alpha = Stat.add('Alpha', fund.id)
+        stat_alpha.set_values([x, [0,0,0,0,0,0]])
+        stat_alpha.commit_values()
+
+        stat_rm = Stat.add('RM', fund.id)
+        stat_rm.set_values([x, [0.1,0.1,0.1,0.15,0.05,0.05]])
+        stat_rm.commit_values()
+
+        stat_rf = Stat.add('RF', fund.id)
+        stat_rf.set_values([x, [0.01,0.01,0.01,0.015,0.005,0.005]])
+        stat_rf.commit_values()
+
+        stat_c_rate = Stat.add('c_rate', fund.id)
+        stat_c_rate.set_values([x, [0.2, 0.2, 0.2, 0.15, 0.15, 0.15]])
+        stat_c_rate.commit_values()
+
+        stat_d_rate = Stat.add('d_rate', fund.id)
+        stat_d_rate.set_values([x, [0.1, 0.1, 0.1, 0.12, 0.15, 0.15]])
+        stat_d_rate.commit_values()
+
+        print("finished adding fund")
         return fund
 
     # this function runs when the "Calculate" button is pressed on the UI.
@@ -73,25 +102,43 @@ class FundController():
         x = dataset['x']
         fund = dataset['fund']
 
-        cyanTotal = 0
-        cyan = []
-        purpleTotal = 0
-        purple = []
-        orangeTotal = 0
-        orange = []
+        growth_rate_quarterly = 0
+        growth_rate = []
+        NAV_beginning = 100
+        NAV = []
+        Unfunded_beginning = 200
+        Unfunded = []
+
+        Called = []
+        Distributed =[]
 
         for i in range (len(x)):
-            purpleTotal += dataset['stats']['Red']['y'][i]
-            purple.append(purpleTotal)
-            orangeTotal += dataset['stats']['Blue']['y'][i]
-            orange.append(orangeTotal)
-            cyanTotal += (dataset['stats']['Red']['y'][i] + dataset['stats']['Blue']['y'][i])
-            cyan.append(cyanTotal)
+            growth_rate_quarterly = (dataset['stats']['Alpha']['y'][i] + dataset['stats']['RF']['y'][i] + dataset['stats']['Beta']['y'][i]*(dataset['stats']['RM']['y'][i]-dataset['stats']['RF']['y'][i]) )
+            growth_rate.append(growth_rate_quarterly)
+
+            Called_quarter = Unfunded_beginning * dataset['stats']['c_rate']['y'][i]
+            Unfunded_beginning -= Called_quarter
+            Unfunded.append(Unfunded_beginning)
+
+            Called.append(Called_quarter)
+
+            Distributed_quarter = NAV_beginning * dataset['stats']['d_rate']['y'][i]
+
+            Distributed.append(Distributed_quarter)
+
+            NAV_beginning *= math.exp(growth_rate_quarterly)
+            NAV_beginning += (Called_quarter-Distributed_quarter)*math.exp(growth_rate_quarterly)
+
+            NAV.append(NAV_beginning)
+
 
         return {'fund': fund, 'x': x, 'stats':{
-            'Cyan': {'y':cyan, 'color_line': settings.colors['Cyan']['color_line'], 'color_fill': settings.colors['Cyan']['color_fill']},
-            'Purple': {'y':purple, 'color_line': settings.colors['Purple']['color_line'], 'color_fill': settings.colors['Purple']['color_fill']},
-            'Orange': {'y':orange, 'color_line': settings.colors['Orange']['color_line'], 'color_fill': settings.colors['Orange']['color_fill']}
+            'growth_rate':  {'y': growth_rate,  'color_line': settings.colors['growth_rate']['color_line'], 'color_fill':   settings.colors['growth_rate']['color_fill']},
+            'NAV':          {'y': NAV,          'color_line': settings.colors['NAV']['color_line'], 'color_fill':           settings.colors['NAV']['color_fill']},
+            'Unfunded':     {'y': Unfunded,     'color_line': settings.colors['Unfunded']['color_line'], 'color_fill':      settings.colors['Unfunded']['color_fill']},
+            'Called':       {'y': Called,       'color_line': settings.colors['Called']['color_line'], 'color_fill':        settings.colors['Called']['color_fill']},
+            'Distributed':  {'y': Distributed,  'color_line': settings.colors['Distributed']['color_line'], 'color_fill':   settings.colors['Distributed']['color_fill']},
+
         }}
 
     # this function runs when the "Commit" button is pressed on the UI
