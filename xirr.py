@@ -1,6 +1,6 @@
 import numpy as np
 
-def transform_cashflow(time, flow):
+def transform_cashflow(time, flow): 
     new_time = []
     new_flow = []
     t_min = min(time)
