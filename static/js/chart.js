@@ -82,7 +82,7 @@ function updateDatasetAsHTable(table, dataset, interactable){
         newValue = dataset.datasets[dIndex].data[vIndex].toFixed(3);
         if (oldValue != newValue){
             value.value = newValue;
-            value.scrollIntoView();
+            value.scrollIntoView({block: 'nearest', inline: 'center', behavior: 'smooth'});
             $(value).css("background-color", "rgba(255, 255, 0, 1)");
             value.setAttribute('fadebackground', '1');
         }
