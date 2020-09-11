@@ -50,8 +50,12 @@ function datasetAsHTable(dataset, interactable){
     var idx = 0;
     for (var item of dataset.datasets){
         html += '<tr style="background-color: '+item.backgroundColor+'" class="table_row">'; // row header
+//        console.log("new row")
+//        console.log(dataset.datasets[idx])
         for (i=0; i<columnCount; i++){
             value = dataset.datasets[idx].data[i]
+//            console.log(" new val")
+//            console.log(value)
             if (interactable){
                 html += '<td class="table_valueContainer"><input class="table_value input" onkeydown="changeValue(this)" type="text" dataset="'+idx+'" index="'+i+'" value="'+value.toFixed(3)+'"></td>';
             } else {
@@ -96,16 +100,16 @@ function updateDatasetAsHTable(table, dataset, interactable){
  */
 function changeValue(ele){
     if (event.key === 'Enter' || event.key === 'Tab'){
-        var data = setupChart.data;
+        var data = marketChart.data;
         datasetIndex = ele.getAttribute("dataset");
         valueIndex = ele.getAttribute("index");
         data.datasets[datasetIndex].data[valueIndex] = parseFloat(ele.value);
-        setupChart.update();
-        // chartdiv.innerHTML = datasetAsHTable(setupChart.data);
+        marketChart.update();
+        // chartdiv.innerHTML = datasetAsHTable(marketChart.data);
     }
 }
 
-var setupChart = null;
+var marketChart = null;
 var chartdiv = null;
 
 /**
@@ -114,7 +118,7 @@ var chartdiv = null;
  */
 function resizeSetupGraph(ele){
     if (event.key === 'Enter' || event.key === 'Tab'){
-        var data = setupChart.data;
+        var data = marketChart.data;
         count = ele.value;
         data.labels.length = count;
         for (var d=0; d<data.datasets.length; d++){
@@ -133,7 +137,7 @@ function resizeSetupGraph(ele){
 //        alert(data.datasets[0].data);
 
         chartdiv.innerHTML = datasetAsHTable(data, true);
-        setupChart.update();
+        marketChart.update();
     }
 }
 
@@ -141,23 +145,40 @@ function resizeSetupGraph(ele){
  * This function generates the top graph with some random predetermined values
  */
 function createSetupChartAndTable(){
-    var setupCanvas = document.getElementById('setupChart');
-    var setupCtx = setupCanvas.getContext('2d');
-    chartdiv = document.getElementById('setupTable');
+    var marketCanvas = document.getElementById('marketChart');
+    var betaCanvas = document.getElementById('betaChart');
+    var marketCtx = marketCanvas.getContext('2d');
+    var betaCtx = betaCanvas.getContext('2d');
+
+    chartdiv = document.getElementById('marketTable');
+    chartdiv1 = document.getElementById('betaTable');
+
     data = {
         labels: loaddata['x'],
         datasets: []
     };
+
+    data1 = {
+        labels: loaddata['x'],
+        datasets: []
+    };
+
     for (let stat in loaddata['stats']){
+        dataset = {label: stat, data: loaddata['stats'][stat]['y']};
+        dataset['backgroundColor'] = [loaddata['stats'][stat]['color_fill']];
+        dataset['borderColor'] = [loaddata['stats'][stat]['color_line']];
+        dataset['borderWidth'] = 1
         if (loaddata['stats_controlled'].includes(stat)){
-            dataset = {label: stat, data: loaddata['stats'][stat]['y']};
-            dataset['backgroundColor'] = [loaddata['stats'][stat]['color_fill']];
-            dataset['borderColor'] = [loaddata['stats'][stat]['color_line']];
-            dataset['borderWidth'] = 1
             data['datasets'].push(dataset);
         }
+
+        if (loaddata['stats_beta'].includes(stat)){
+            data1['datasets'].push(dataset);
+        }
     };
-    setupChart = new Chart(setupCtx, {
+
+
+    marketChart = new Chart(marketCtx, {
         type: 'line',
         data: data,
         options: {
@@ -171,29 +192,65 @@ function createSetupChartAndTable(){
         }
     });
 
+    betaChart = new Chart(betaCtx, {
+        type: 'line',
+        data: data1,
+        options: {
+            scales: {
+                yAxes: [{
+                    ticks: {
+                        beginAtZero: true
+                    }
+                }]
+            }
+        }
+    });
+
     dIndex = -1;
     cIndex = -1;
-    setupCanvas.onmousedown = function(e){
-        ele = setupChart.getElementAtEvent(e);
+
+    marketCanvas.onmousedown = function(e){
+        ele = marketChart.getElementAtEvent(e);
         if (ele.length > 0){
             dIndex = ele[0]._datasetIndex;
             cIndex = ele[0]._index;
         }
     }
 
-    setupCanvas.onmouseup = function(e){
-        var yValue = getValueY(e, setupChart)
+    betaCanvas.onmousedown = function(e){
+        ele = betaChart.getElementAtEvent(e);
+        if (ele.length > 0){
+            dIndex = ele[0]._datasetIndex;
+            cIndex = ele[0]._index;
+        }
+    }
+
+    marketCanvas.onmouseup = function(e){
+        var yValue = getValueY(e, marketChart)
         if (dIndex > -1){
-            var data = setupChart.data;
+            var data = marketChart.data;
             data.datasets[dIndex].data[cIndex] = yValue;
-            setupChart.update();
-            //chartdiv.innerHTML = datasetAsHTable(setupChart.data, true);
-            updateDatasetAsHTable(chartdiv, setupChart.data, true);
+            marketChart.update();
+            //chartdiv.innerHTML = datasetAsHTable(marketChart.data, true);
+            updateDatasetAsHTable(chartdiv, marketChart.data, true);
             dIndex = -1;
         }
     }
 
-    chartdiv.innerHTML = datasetAsHTable(setupChart.data, true);
+    betaCanvas.onmouseup = function(e){
+        var yValue = getValueY(e, marketChart)
+        if (dIndex > -1){
+            var data = betaChart.data;
+            data.datasets[dIndex].data[cIndex] = yValue;
+            betaChart.update();
+            //chartdiv.innerHTML = datasetAsHTable(marketChart.data, true);
+            updateDatasetAsHTable(chartdiv1, betaChart.data, true);
+            dIndex = -1;
+        }
+    }
+
+    chartdiv.innerHTML = datasetAsHTable(marketChart.data, true);
+    chartdiv1.innerHTML = datasetAsHTable(betaChart.data, true);
 }
 
 
@@ -212,7 +269,7 @@ function createCalcChartAndTable(){
         datasets: []
     };
     for (let stat in loaddata['stats']){
-        if (!loaddata['stats_controlled'].includes(stat)){
+        if (loaddata['stats_calculated'].includes(stat)){
             dataset = {label: stat, data: loaddata['stats'][stat]['y']};
             dataset['backgroundColor'] = [loaddata['stats'][stat]['color_fill']];
             dataset['borderColor'] = [loaddata['stats'][stat]['color_line']];
@@ -260,10 +317,16 @@ function updateCalcGraph(ds){
  * The server then responds with calculated data, which is applied to the bottom chart
  */
 function calcGraph(){
-    body = {fund: loaddata['fund'], x: setupChart.data.labels, stats:{}};
-    for (var i=0; i<setupChart.data.datasets.length; i++){
-        body['stats'][setupChart.data.datasets[i].label] = {
-            y: setupChart.data.datasets[i].data
+    body = {fund: loaddata['fund'], x: marketChart.data.labels, stats:{}};
+    for (var i=0; i<marketChart.data.datasets.length; i++){
+        body['stats'][marketChart.data.datasets[i].label] = {
+            y: marketChart.data.datasets[i].data
+        }
+    };
+
+    for (var i=0; i<betaChart.data.datasets.length; i++){
+        body['stats'][betaChart.data.datasets[i].label] = {
+            y: betaChart.data.datasets[i].data
         }
     };
 
@@ -286,10 +349,10 @@ function calcGraph(){
  * the server will save these values to the database, when the page refresh the data will be retained
  */
 function commitGraph(){
-    body = {fund: loaddata['fund'], x: setupChart.data.labels, stats:{}};
-    for (var i=0; i<setupChart.data.datasets.length; i++){
-        body['stats'][setupChart.data.datasets[i].label] = {
-            y: setupChart.data.datasets[i].data
+    body = {fund: loaddata['fund'], x: marketChart.data.labels, stats:{}};
+    for (var i=0; i<marketChart.data.datasets.length; i++){
+        body['stats'][marketChart.data.datasets[i].label] = {
+            y: marketChart.data.datasets[i].data
         }
     }
     for (var i=0; i<calcChart.data.datasets.length; i++){

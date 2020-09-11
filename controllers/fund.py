@@ -14,10 +14,13 @@ class FundController():
         fund = Fund.find(fund_id)
         profile = Profile.find(fund.prof)
         organization = Organization.find(profile.org)
-        stats_beta = ['Beta']  # these stats show up in the top graph
-        stats_controlled = ['Alpha', 'RM', 'RF']  # these stats show up in the top graph
-        stats_curves = ['c_rate', 'd_rate']  # these stats show up in the top graph
-        stats_calculated = ['growth_rate', 'NAV', 'Unfunded'] # these stats show up in the bottom graph
+        # these stats are inputs and show up in the top part of the page
+        stats_beta = ['Beta']
+        stats_controlled = ['Alpha', 'RM', 'RF']
+        stats_curves = ['c_rate', 'd_rate']
+
+        # these stats are calculated and show up after calc is clicked
+        stats_calculated = ['growth_rate', 'NAV', 'Unfunded']
 
 
         stats = {}
@@ -55,7 +58,8 @@ class FundController():
             'stats': stats,
             'stats_beta': stats_beta,
             'stats_curves': stats_curves,
-            'stats_controlled': stats_controlled
+            'stats_controlled': stats_controlled,
+            'stats_calculated': stats_calculated
         }
 
     # This function creates a new fund with default stats
@@ -102,7 +106,6 @@ class FundController():
         x = dataset['x']
         fund = dataset['fund']
 
-        growth_rate_quarterly = 0
         growth_rate = []
         NAV_beginning = 100
         NAV = []

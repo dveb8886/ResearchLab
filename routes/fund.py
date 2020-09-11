@@ -14,7 +14,9 @@ def fund(fund_id):
                            org_name=answers['org_name'],
                            x=answers['x'],
                            stats=answers['stats'],
-                           stats_controlled=answers['stats_controlled']
+                           stats_controlled=answers['stats_controlled'],
+                           stats_calculated=answers['stats_calculated'],
+                           stats_beta=answers['stats_beta']
     )
 
 @fund_api.route('/add', methods=['post'])
