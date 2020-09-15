@@ -5,6 +5,16 @@ from model.stat import Stat
 import general.settings as settings
 import math
 
+
+x_values = [1,2,3,4,5,6]
+beta_values = [1.26,2.34,1.26,1.26,1.26,1.26]
+alpha_values = [0,0,0,0,0,0]
+rm_values = [0.06,0.04,0.19,0.16,0.08,0.09]
+rf_values = [0.01,0.01,0.01,0.015,0.005,0.005]
+c_values = [0.2, 0.2, 0.2, 0.15, 0.15, 0.15]
+d_values = [0.1, 0.1, 0.1, 0.12, 0.15, 0.15]
+
+
 class FundController():
 
     def __init__(self):
@@ -14,13 +24,14 @@ class FundController():
         fund = Fund.find(fund_id)
         profile = Profile.find(fund.prof)
         organization = Organization.find(profile.org)
+
         # these stats are inputs and show up in the top part of the page
         stats_beta = ['Beta']
         stats_controlled = ['Alpha', 'RM', 'RF']
         stats_curves = ['c_rate', 'd_rate']
 
         # these stats are calculated and show up after calc is clicked
-        stats_calculated = ['growth_rate', 'NAV', 'Unfunded']
+        stats_calculated = ['growth_rate', 'NAV', 'Unfunded', 'Called', 'Distributed']
 
 
         stats = {}
@@ -66,30 +77,30 @@ class FundController():
     def addFund(self, fund_name, org_id):
         print("adding new fund")
         fund = Fund.add(fund_name, org_id)
-        x = [1,2,3,4,5,6]
+        x = x_values
 
         stat_beta = Stat.add('Beta', fund.id)
-        stat_beta.set_values([x, [1.26,5.34,1.26,1.26,1.26,1.26]])
+        stat_beta.set_values([x, beta_values])
         stat_beta.commit_values()
 
         stat_alpha = Stat.add('Alpha', fund.id)
-        stat_alpha.set_values([x, [0,0,0,0,0,0]])
+        stat_alpha.set_values([x, alpha_values])
         stat_alpha.commit_values()
 
         stat_rm = Stat.add('RM', fund.id)
-        stat_rm.set_values([x, [0.1,0.1,0.1,0.15,0.05,0.05]])
+        stat_rm.set_values([x, rm_values])
         stat_rm.commit_values()
 
         stat_rf = Stat.add('RF', fund.id)
-        stat_rf.set_values([x, [0.01,0.01,0.01,0.015,0.005,0.005]])
+        stat_rf.set_values([x, rf_values])
         stat_rf.commit_values()
 
         stat_c_rate = Stat.add('c_rate', fund.id)
-        stat_c_rate.set_values([x, [0.2, 0.2, 0.2, 0.15, 0.15, 0.15]])
+        stat_c_rate.set_values([x, c_values])
         stat_c_rate.commit_values()
 
         stat_d_rate = Stat.add('d_rate', fund.id)
-        stat_d_rate.set_values([x, [0.1, 0.1, 0.1, 0.12, 0.15, 0.15]])
+        stat_d_rate.set_values([x, d_values])
         stat_d_rate.commit_values()
 
         print("finished adding fund")

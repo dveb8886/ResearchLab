@@ -13,9 +13,12 @@
         fund: {{ fund|safe }},
         x: {{ x|safe }},
         stats: {{ stats|safe }},
+
         stats_controlled: {{ stats_controlled|safe }},
-        stats_calculated: {{ stats_calculated|safe }},
-        stats_beta: {{ stats_beta|safe }}
+        stats_beta: {{ stats_beta|safe }},
+        stats_curves: {{ stats_curves|safe }},
+
+        stats_calculated: {{ stats_calculated|safe }}
 
     }
 </script>
@@ -29,7 +32,6 @@
 
     <canvas id="curvesChart" width="300" height="100"></canvas>
     <div id="curvesTable"></div>
-
 
     <div id="calculate_container">
         <button type="button" id="calculate_button" onclick="calcGraph()">Calculate</button>

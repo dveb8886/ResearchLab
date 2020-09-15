@@ -51,7 +51,7 @@ function datasetAsHTable(dataset, interactable){
     for (var item of dataset.datasets){
         html += '<tr style="background-color: '+item.backgroundColor+'" class="table_row">'; // row header
 //        console.log("new row")
-//        console.log(dataset.datasets[idx])
+        console.log(dataset.datasets[idx])
         for (i=0; i<columnCount; i++){
             value = dataset.datasets[idx].data[i]
 //            console.log(" new val")
@@ -147,11 +147,16 @@ function resizeSetupGraph(ele){
 function createSetupChartAndTable(){
     var marketCanvas = document.getElementById('marketChart');
     var betaCanvas = document.getElementById('betaChart');
+    var curvesCanvas = document.getElementById('curvesChart');
+
     var marketCtx = marketCanvas.getContext('2d');
     var betaCtx = betaCanvas.getContext('2d');
+    var curvesCtx = curvesCanvas.getContext('2d');
 
     chartdiv = document.getElementById('marketTable');
     chartdiv1 = document.getElementById('betaTable');
+    chartdiv2 = document.getElementById('curvesTable');
+
 
     data = {
         labels: loaddata['x'],
@@ -162,6 +167,12 @@ function createSetupChartAndTable(){
         labels: loaddata['x'],
         datasets: []
     };
+
+    data2 = {
+        labels: loaddata['x'],
+        datasets: []
+    };
+
 
     for (let stat in loaddata['stats']){
         dataset = {label: stat, data: loaddata['stats'][stat]['y']};
@@ -175,6 +186,11 @@ function createSetupChartAndTable(){
         if (loaddata['stats_beta'].includes(stat)){
             data1['datasets'].push(dataset);
         }
+
+        if (loaddata['stats_curves'].includes(stat)){
+            data2['datasets'].push(dataset);
+        }
+
     };
 
 
@@ -206,6 +222,21 @@ function createSetupChartAndTable(){
         }
     });
 
+    curvesChart = new Chart(curvesCtx, {
+        type: 'line',
+        data: data2,
+        options: {
+            scales: {
+                yAxes: [{
+                    ticks: {
+                        beginAtZero: true
+                    }
+                }]
+            }
+        }
+    });
+
+
     dIndex = -1;
     cIndex = -1;
 
@@ -219,6 +250,14 @@ function createSetupChartAndTable(){
 
     betaCanvas.onmousedown = function(e){
         ele = betaChart.getElementAtEvent(e);
+        if (ele.length > 0){
+            dIndex = ele[0]._datasetIndex;
+            cIndex = ele[0]._index;
+        }
+    }
+
+    curvesCanvas.onmousedown = function(e){
+        ele = curvesChart.getElementAtEvent(e);
         if (ele.length > 0){
             dIndex = ele[0]._datasetIndex;
             cIndex = ele[0]._index;
@@ -243,14 +282,27 @@ function createSetupChartAndTable(){
             var data = betaChart.data;
             data.datasets[dIndex].data[cIndex] = yValue;
             betaChart.update();
-            //chartdiv.innerHTML = datasetAsHTable(marketChart.data, true);
+            //chartdiv.innerHTML = datasetAsHTable(betaChart.data, true);
             updateDatasetAsHTable(chartdiv1, betaChart.data, true);
+            dIndex = -1;
+        }
+    }
+
+    curvesCanvas.onmouseup = function(e){
+        var yValue = getValueY(e, marketChart)
+        if (dIndex > -1){
+            var data = curvesChart.data;
+            data.datasets[dIndex].data[cIndex] = yValue;
+            curvesChart.update();
+            //chartdiv.innerHTML = datasetAsHTable(curvesChart.data, true);
+            updateDatasetAsHTable(chartdiv2, curvesChart.data, true);
             dIndex = -1;
         }
     }
 
     chartdiv.innerHTML = datasetAsHTable(marketChart.data, true);
     chartdiv1.innerHTML = datasetAsHTable(betaChart.data, true);
+    chartdiv2.innerHTML = datasetAsHTable(curvesChart.data, true);
 }
 
 
@@ -318,6 +370,7 @@ function updateCalcGraph(ds){
  */
 function calcGraph(){
     body = {fund: loaddata['fund'], x: marketChart.data.labels, stats:{}};
+
     for (var i=0; i<marketChart.data.datasets.length; i++){
         body['stats'][marketChart.data.datasets[i].label] = {
             y: marketChart.data.datasets[i].data
@@ -327,6 +380,12 @@ function calcGraph(){
     for (var i=0; i<betaChart.data.datasets.length; i++){
         body['stats'][betaChart.data.datasets[i].label] = {
             y: betaChart.data.datasets[i].data
+        }
+    };
+
+    for (var i=0; i<curvesChart.data.datasets.length; i++){
+        body['stats'][curvesChart.data.datasets[i].label] = {
+            y: curvesChart.data.datasets[i].data
         }
     };
 
@@ -355,11 +414,24 @@ function commitGraph(){
             y: marketChart.data.datasets[i].data
         }
     }
+    for (var i=0; i<betaChart.data.datasets.length; i++){
+        body['stats'][betaChart.data.datasets[i].label] = {
+            y: betaChart.data.datasets[i].data
+        }
+    }
+
+    for (var i=0; i<curvesChart.data.datasets.length; i++){
+        body['stats'][curvesChart.data.datasets[i].label] = {
+            y: curvesChart.data.datasets[i].data
+        }
+    }
+
     for (var i=0; i<calcChart.data.datasets.length; i++){
         body['stats'][calcChart.data.datasets[i].label] = {
             y: calcChart.data.datasets[i].data
         }
     }
+
     $.ajax({
         url: "/fund/commit",
         type: "POST",
