@@ -20,7 +20,7 @@ def init():
         handler.org_add(org_name='Test Company')
         handler.user_add(id=1, user_name='Test User', org=1)
         handler.prof_add(id=1, prof_name='Test Profile', org=1)
-        handler.fund_add(id=1, fund_name='Test Fund', prof=1)
+        handler.fund_add(id=1, fund_name='Test Fund', fund_manager="Test Manager", fund_vintage=2000, fund_nav=0.00, fund_unfunded=0.00, prof=1)
 
     # return the queries handler
     return handler

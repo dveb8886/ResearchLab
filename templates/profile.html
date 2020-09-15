@@ -18,7 +18,26 @@
         {% endfor %}
         </ol>
         <form action="{{ url_for('fund_api.add') }}" method="post">
-            <input name="fund_name" />
+
+            <table class="table_tag">
+                <tbody>
+                    <tr>
+                        <th class="table_colHeader">Fund Name</th>
+                        <th class="table_colHeader">Fund Manager</th>
+                        <th class="table_colHeader">Fund Vintage</th>
+                        <th class="table_colHeader">Fund NAV</th>
+                        <th class="table_colHeader">Fund Unfunded</th>
+                    </tr>
+                    <tr class="table_row">
+                        <td class="table_valueContainer"><input name="fund_name" /></td>
+                        <td class="table_valueContainer"><input name="fund_manager" /></td>
+                        <td class="table_valueContainer"><input name="fund_vintage" value="2000"/></td>
+                        <td class="table_valueContainer"><input name="fund_nav" value="1,000.00"/></td>
+                        <td class="table_valueContainer"><input name="fund_unfunded" value="1,000.00" /></td>
+                    </tr>
+                </tbody>
+            </table>
+
             <input name="prof_id" hidden="true" value="{{ prof.id }}" />
             <button>Add Fund</button>
         </form>
