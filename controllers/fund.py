@@ -41,7 +41,7 @@ class FundController():
                     x = [x for x in range(6)]
 
         return {
-            'fund_name': fund.fund_name + ", fund_vintage: " + str(fund.fund_vintage),
+            'fund_name': fund.fund_name,
             'fund': fund_id,
             'prof_name': profile.prof_name,
             'org_name': organization.org_name,
