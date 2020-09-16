@@ -21,7 +21,12 @@ def fund(fund_id):
 def add():
     fund_name = request.form['fund_name']
     prof_id = request.form['prof_id']
-    controller.addFund(fund_name, prof_id)
+    fund_manager = request.form['fund_manager']
+    fund_vintage = request.form['fund_vintage']
+    fund_nav = request.form['fund_nav']
+    fund_unfunded = request.form['fund_unfunded']
+
+    controller.addFund(fund_name, fund_manager, fund_vintage, fund_nav, fund_unfunded, prof_id)
     return redirect(url_for('profile_api.prof', prof_id=prof_id))
 
 @fund_api.route('/calc', methods=["post"])
