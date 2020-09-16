@@ -74,9 +74,8 @@ class FundController():
         }
 
     # This function creates a new fund with default stats
-    def addFund(self, fund_name, org_id):
-        print("adding new fund")
-        fund = Fund.add(fund_name, org_id)
+    def addFund(self, fund_name, fund_manager, fund_vintage, fund_nav, fund_unfunded, prof):
+        fund = Fund.add(fund_name, fund_manager, fund_vintage, fund_nav, fund_unfunded, prof)
         x = x_values
 
         stat_beta = Stat.add('Beta', fund.id)
@@ -102,8 +101,6 @@ class FundController():
         stat_d_rate = Stat.add('d_rate', fund.id)
         stat_d_rate.set_values([x, d_values])
         stat_d_rate.commit_values()
-
-        print("finished adding fund")
         return fund
 
     # this function runs when the "Calculate" button is pressed on the UI.
@@ -116,6 +113,11 @@ class FundController():
     def calcGraph(self, dataset):
         x = dataset['x']
         fund = dataset['fund']
+        fund_db = Fund.find(fund)
+        nav_value = fund_db.fund_nav
+        unfunded_valuev = fund_db.fund_unfunded
+        fund_manager = fund_db.fund_manager
+        vintage_value = fund_db.fund_vintage
 
         growth_rate = []
         NAV_beginning = 100

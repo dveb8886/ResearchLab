@@ -6,6 +6,10 @@ class Fund:
         self.id = field_dict["id"]
         self.prof = field_dict["prof"]
         self.fund_name = field_dict["fund_name"]
+        self.fund_manager = field_dict["fund_manager"]
+        self.fund_vintage = field_dict["fund_vintage"]
+        self.fund_nav = field_dict["fund_nav"]
+        self.fund_unfunded = field_dict["fund_unfunded"]
 
     def __str__(self):
         return "fund[" + str(self.id) + ": "+self.fund_name + "]"
@@ -14,8 +18,8 @@ class Fund:
         return self.__str__()
 
     @staticmethod
-    def add(fund_name, prof):
-        id = settings.sql.fund_add(fund_name=fund_name, prof=prof)
+    def add(fund_name, fund_manager, fund_vintage, fund_nav, fund_unfunded, prof):
+        id = settings.sql.fund_add(fund_name=fund_name, fund_manager=fund_manager, fund_vintage=fund_vintage, fund_nav=fund_nav, fund_unfunded=fund_unfunded, prof=prof)
         return Fund.find(id)
 
     @staticmethod
