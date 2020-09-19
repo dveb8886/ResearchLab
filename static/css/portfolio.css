@@ -1,0 +1,59 @@
+.main-content-container {
+    background-color: cyan;
+}
+
+.tab-container {
+
+    border-color: red;
+    border-style: solid;
+}
+
+.tab-content-container {
+    border-color: red;
+    border-style: solid;
+    overflow: scroll;
+    height: 200px;
+}
+
+.tab {
+    display: inline-block;
+    border-color: blue;
+    border-style: solid;
+}
+
+.fund-container {
+    border-color: blue;
+    border-style: solid;
+}
+
+.fund-summary-item {
+    display: inline-block;
+    border-color: orange;
+    border-style: solid;
+}
+
+.fund-name {
+    width: 30%;
+}
+
+.fund-preview {
+    width: 65%;
+}
+
+.fund-summary {
+    display: flex;
+    justify-content: space-between;
+}
+
+.fund-contents {
+    border-color: orange;
+    border-style: solid;
+}
+
+.fund-tab-item {
+
+}
+
+.hidden {
+    display: none;
+}

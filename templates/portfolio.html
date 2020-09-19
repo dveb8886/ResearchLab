@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/portfolio.css') }}">
+    <!--<script src="{{ url_for('static', filename='js/Chart.bundle.min.js') }}"></script>-->
+    <script src="{{ url_for('static', filename='js/jquery-3.4.1.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/portfolio.js') }}"></script>
+</head>
+<body>
+    <h1>{{ prof.prof_name }}</h1>
+    <div>
+        <div class="main-content-container">
+            <div class="tab-container">
+                <div class="tab" value="fund-attributes">Attributes</div>
+                <div class="tab" value="fund-alpha">Alpha</div>
+                <div class="tab" value="fund-curves">Curves</div>
+                <div class="tab" value="fund-beta">Beta</div>
+            </div>
+            <div class="tab-content-container">
+                {% for fund in funds %}
+                <div class="fund-container">
+                    <div class="fund-summary">
+                        <div class="fund-summary-item fund-name">{{ fund.fund_name }}</div>
+                        <div class="fund-summary-item fund-preview">
+                            <div class="fund-tab-item fund-attributes">Manager: {{ fund.fund_manager }}</div>
+                            <div class="fund-tab-item hidden fund-alpha">Alpha: (some graph)</div>
+                            <div class="fund-tab-item hidden fund-curves">Curves: (some graph)</div>
+                            <div class="fund-tab-item hidden fund-beta">Beta: (some graph)</div>
+                        </div>
+                    </div>
+                    <div class="fund-contents hidden">(bigger graph and table)</div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    <br />
+    <div>
+        <h1>Old Part of page</h1>
+        <h4>Funds</h4>
+        <div>
+            <ol>
+            {% for fund in funds %}
+                <li><a href="{{ url_for('fund_api.fund', fund_id=fund.id) }}">{{ fund.fund_manager }} > {{ fund.fund_name }} > {{ fund.fund_vintage }} > {{ fund.fund_nav }} > {{ fund.fund_unfunded }}</a></li>
+            {% endfor %}
+            </ol>
+            <form action="{{ url_for('fund_api.add') }}" method="post">
+
+                <table class="table_tag">
+                    <tbody>
+                        <tr>
+                            <th class="table_colHeader">Fund Name</th>
+                            <th class="table_colHeader">Fund Manager</th>
+                            <th class="table_colHeader">Fund Vintage</th>
+                            <th class="table_colHeader">Fund NAV</th>
+                            <th class="table_colHeader">Fund Unfunded</th>
+                        </tr>
+                        <tr class="table_row">
+                            <td class="table_valueContainer"><input name="fund_name" /></td>
+                            <td class="table_valueContainer"><input name="fund_manager" /></td>
+                            <td class="table_valueContainer"><input name="fund_vintage" value="2000"/></td>
+                            <td class="table_valueContainer"><input name="fund_nav" value="1,000.00"/></td>
+                            <td class="table_valueContainer"><input name="fund_unfunded" value="1,000.00" /></td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <input name="prof_id" hidden="true" value="{{ prof.id }}" />
+                <button>Add Fund</button>
+            </form>
+        </div>
+
+    </div>
+</body>
+</html>

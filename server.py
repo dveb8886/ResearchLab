@@ -2,6 +2,7 @@ import importlib
 import general.settings as settings
 import model.model_setup as model_setup
 from routes.organization import organization_api
+from routes.portfolio import portfolio_api
 from routes.profile import profile_api
 from routes.fund import fund_api
 
@@ -15,6 +16,7 @@ model_setup.init()
 # initialize major routes and their controllers
 # these routes can be found in the routes/ directory
 app.register_blueprint(organization_api, url_prefix='/organization')
+app.register_blueprint(portfolio_api, url_prefix='/portfolio')
 app.register_blueprint(profile_api, url_prefix='/profile')
 app.register_blueprint(fund_api, url_prefix='/fund')
 
