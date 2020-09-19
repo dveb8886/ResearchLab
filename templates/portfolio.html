@@ -20,9 +20,9 @@
             </div>
             <div class="tab-content-container">
                 {% for fund in funds %}
-                <div class="fund-container">
+                <div class="fund-container" fund="{{ fund.id }}">
                     <div class="fund-summary">
-                        <div class="fund-summary-item fund-name">{{ fund.fund_name }}</div>
+                        <div class="fund-summary-item fund-name" fund="{{ fund.id }}">{{ fund.fund_name }}</div>
                         <div class="fund-summary-item fund-preview">
                             <div class="fund-tab-item fund-attributes">Manager: {{ fund.fund_manager }}</div>
                             <div class="fund-tab-item hidden fund-alpha">Alpha: (some graph)</div>
@@ -33,6 +33,30 @@
                     <div class="fund-contents hidden">(bigger graph and table)</div>
                 </div>
                 {% endfor %}
+                <form action="{{ url_for('fund_api.add') }}" method="post">
+                    <div class="fund-container">
+                        <div class="fund-summary">
+                            <div class="fund-summary-item fund-name"><input name="fund_name" /></div>
+                            <div class="fund-summary-item fund-preview">
+                                <input name="prof_id" hidden="true" value="{{ prof.id }}" />
+                                <button>Add Fund</button>
+                            </div>
+                        </div>
+                        <div class="fund-contents hidden">
+                            <td class="table_valueContainer"><input name="fund_manager" /></td>
+                            <td class="table_valueContainer"><input name="fund_vintage" value="2000"/></td>
+                            <td class="table_valueContainer"><input name="fund_nav" value="1,000.00"/></td>
+                            <td class="table_valueContainer"><input name="fund_unfunded" value="1,000.00" /></td>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="button-controls">
+                <button>Calculate</button>
+                <button>Commit</button>
+            </div>
+            <div class="result-content">
+                Results will go here
             </div>
         </div>
     </div>

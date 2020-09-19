@@ -57,3 +57,13 @@
 .hidden {
     display: none;
 }
+
+.button-controls {
+    border-color: red;
+    border-style: solid;
+}
+
+.result-content {
+    border-color: red;
+    border-style: solid;
+}

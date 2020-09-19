@@ -21,7 +21,8 @@ window.addEventListener('load', function(){
 
     // click listener that show fund contents when fund name is clicked
     $('.fund-name').click(function(){
-        var fund_contents = $('.fund-contents', $(this).parent().parent())
+        var fund_id = $(this).attr('fund');
+        var fund_contents = $('.fund-contents', $('.fund-container[fund=\''+fund_id+'\']'))
         fund_contents.toggleClass('hidden')
     });
 
