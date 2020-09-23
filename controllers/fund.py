@@ -115,14 +115,12 @@ class FundController():
         fund = dataset['fund']
         fund_db = Fund.find(fund)
         nav_value = fund_db.fund_nav
-        unfunded_valuev = fund_db.fund_unfunded
+        unfunded_value = fund_db.fund_unfunded
         fund_manager = fund_db.fund_manager
         vintage_value = fund_db.fund_vintage
 
         growth_rate = []
-        NAV_beginning = 100
         NAV = []
-        Unfunded_beginning = 200
         Unfunded = []
 
         Called = []
@@ -132,20 +130,20 @@ class FundController():
             growth_rate_quarterly = (dataset['stats']['Alpha']['y'][i] + dataset['stats']['RF']['y'][i] + dataset['stats']['Beta']['y'][i]*(dataset['stats']['RM']['y'][i]-dataset['stats']['RF']['y'][i]) )
             growth_rate.append(growth_rate_quarterly)
 
-            Called_quarter = Unfunded_beginning * dataset['stats']['c_rate']['y'][i]
-            Unfunded_beginning -= Called_quarter
-            Unfunded.append(Unfunded_beginning)
+            Called_quarter = unfunded_value * dataset['stats']['c_rate']['y'][i]
+            unfunded_value -= Called_quarter
+            Unfunded.append(unfunded_value)
 
             Called.append(Called_quarter)
 
-            Distributed_quarter = NAV_beginning * dataset['stats']['d_rate']['y'][i]
+            Distributed_quarter = nav_value * dataset['stats']['d_rate']['y'][i]
 
             Distributed.append(Distributed_quarter)
 
-            NAV_beginning *= math.exp(growth_rate_quarterly)
-            NAV_beginning += (Called_quarter-Distributed_quarter)*math.exp(growth_rate_quarterly)
+            nav_value *= math.exp(growth_rate_quarterly)
+            nav_value += (Called_quarter-Distributed_quarter)*math.exp(growth_rate_quarterly)
 
-            NAV.append(NAV_beginning)
+            NAV.append(nav_value)
 
 
         return {'fund': fund, 'x': x, 'stats':{

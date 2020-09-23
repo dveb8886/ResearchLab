@@ -21,7 +21,7 @@ function getValueY(e, chart){
 /**
  * This function creates a table based on a dataset
  */
-function datasetAsHTable(dataset, interactable){
+function datasetAsHTable(dataset, interactable, graphName){
     var html = '<div class="table_container">';
     html += '<div class="table_row_header">';
     html += '<table class="table_tag">';
@@ -57,7 +57,7 @@ function datasetAsHTable(dataset, interactable){
 //            console.log(" new val")
 //            console.log(value)
             if (interactable){
-                html += '<td class="table_valueContainer"><input class="table_value input" onkeydown="changeValue(this)" type="text" dataset="'+idx+'" index="'+i+'" value="'+value.toFixed(3)+'"></td>';
+                html += '<td class="table_valueContainer"><input class="table_value input" onkeydown="changeValue(this)" type="text" dataset="'+idx+'" index="'+i+'" graphName="'+graphName+'" value="'+value.toFixed(3)+'"></td>';
             } else {
                 html += '<td class="table_valueContainer"><div class="table_value fixed" dataset="'+idx+'" index="'+i+'">'+value.toFixed(3)+'</div></td>';
             }
@@ -100,17 +100,26 @@ function updateDatasetAsHTable(table, dataset, interactable){
  */
 function changeValue(ele){
     if (event.key === 'Enter' || event.key === 'Tab'){
-        var data = marketChart.data;
         datasetIndex = ele.getAttribute("dataset");
         valueIndex = ele.getAttribute("index");
+        graphName = ele.getAttribute("graphName");
+        var chart = null;
+        if (graphName == 'market') chart = marketChart;
+        if (graphName == 'beta') chart = betaChart;
+        if (graphName == 'curves') chart = curvesChart;
+        var data = chart.data;
         data.datasets[datasetIndex].data[valueIndex] = parseFloat(ele.value);
-        marketChart.update();
-        // chartdiv.innerHTML = datasetAsHTable(marketChart.data);
+        chart.update();
     }
 }
 
 var marketChart = null;
-var chartdiv = null;
+var betaChart = null;
+var curvesChart = null;
+
+var marketTable = null;
+var betaTable = null;
+var curvesTable = null;
 
 /**
  * This function executes when you change the number in the size field of the table
@@ -118,26 +127,64 @@ var chartdiv = null;
  */
 function resizeSetupGraph(ele){
     if (event.key === 'Enter' || event.key === 'Tab'){
-        var data = marketChart.data;
         count = ele.value;
-        data.labels.length = count;
-        for (var d=0; d<data.datasets.length; d++){
-            data.datasets[d].data.length = count
+
+        var marketData = marketChart.data;
+        var betaData = betaChart.data;
+        var curvesData = curvesChart.data;
+
+        marketData.labels.length = count;
+        betaData.labels.length = count;
+        curvesData.labels.length = count;
+
+
+        for (var d=0; d<marketData.datasets.length; d++){
+            marketData.datasets[d].data.length = count
         }
+
+        for (var d=0; d<betaData.datasets.length; d++){
+            betaData.datasets[d].data.length = count
+        }
+
+        for (var d=0; d<curvesData.datasets.length; d++){
+            curvesData.datasets[d].data.length = count
+        }
+
         for (var i=0; i<count; i++){
-            data.labels[i] = (i+1);
-            for (var d=0; d<data.datasets.length; d++){
-                var value = data.datasets[d].data[i];
+            marketData.labels[i] = (i+1);
+            betaData.labels[i] = (i+1);
+            curvesData.labels[i] = (i+1);
+
+            for (var d=0; d<marketData.datasets.length; d++){
+                var value = marketData.datasets[d].data[i];
                 if (value == undefined){
-                    data.datasets[d].data[i] = 0;
+                    marketData.datasets[d].data[i] = 0;
+                }
+            }
+
+            for (var d=0; d<betaData.datasets.length; d++){
+                var value = betaData.datasets[d].data[i];
+                if (value == undefined){
+                    betaData.datasets[d].data[i] = 0;
+                }
+            }
+
+            for (var d=0; d<curvesData.datasets.length; d++){
+                var value = curvesData.datasets[d].data[i];
+                if (value == undefined){
+                    curvesData.datasets[d].data[i] = 0;
                 }
             }
         }
-//        alert(data.labels);
-//        alert(data.datasets[0].data);
 
-        chartdiv.innerHTML = datasetAsHTable(data, true);
+        marketTable.innerHTML = datasetAsHTable(marketData, true);
         marketChart.update();
+
+        betaTable.innerHTML = datasetAsHTable(betaData, true);
+        betaChart.update();
+
+        curvesTable.innerHTML = datasetAsHTable(curvesData, true);
+        curvesChart.update();
     }
 }
 
@@ -153,9 +200,9 @@ function createSetupChartAndTable(){
     var betaCtx = betaCanvas.getContext('2d');
     var curvesCtx = curvesCanvas.getContext('2d');
 
-    chartdiv = document.getElementById('marketTable');
-    chartdiv1 = document.getElementById('betaTable');
-    chartdiv2 = document.getElementById('curvesTable');
+    marketTable = document.getElementById('marketTable');
+    betaTable = document.getElementById('betaTable');
+    curvesTable = document.getElementById('curvesTable');
 
 
     data = {
@@ -270,39 +317,36 @@ function createSetupChartAndTable(){
             var data = marketChart.data;
             data.datasets[dIndex].data[cIndex] = yValue;
             marketChart.update();
-            //chartdiv.innerHTML = datasetAsHTable(marketChart.data, true);
-            updateDatasetAsHTable(chartdiv, marketChart.data, true);
+            updateDatasetAsHTable(marketTable, marketChart.data, true);
             dIndex = -1;
         }
     }
 
     betaCanvas.onmouseup = function(e){
-        var yValue = getValueY(e, marketChart)
+        var yValue = getValueY(e, betaChart)
         if (dIndex > -1){
             var data = betaChart.data;
             data.datasets[dIndex].data[cIndex] = yValue;
             betaChart.update();
-            //chartdiv.innerHTML = datasetAsHTable(betaChart.data, true);
-            updateDatasetAsHTable(chartdiv1, betaChart.data, true);
+            updateDatasetAsHTable(betaTable, betaChart.data, true);
             dIndex = -1;
         }
     }
 
     curvesCanvas.onmouseup = function(e){
-        var yValue = getValueY(e, marketChart)
+        var yValue = getValueY(e, curvesChart)
         if (dIndex > -1){
             var data = curvesChart.data;
             data.datasets[dIndex].data[cIndex] = yValue;
             curvesChart.update();
-            //chartdiv.innerHTML = datasetAsHTable(curvesChart.data, true);
-            updateDatasetAsHTable(chartdiv2, curvesChart.data, true);
+            updateDatasetAsHTable(curvesTable, curvesChart.data, true);
             dIndex = -1;
         }
     }
 
-    chartdiv.innerHTML = datasetAsHTable(marketChart.data, true);
-    chartdiv1.innerHTML = datasetAsHTable(betaChart.data, true);
-    chartdiv2.innerHTML = datasetAsHTable(curvesChart.data, true);
+    marketTable.innerHTML = datasetAsHTable(marketChart.data, true, "market");
+    betaTable.innerHTML = datasetAsHTable(betaChart.data, true, "beta");
+    curvesTable.innerHTML = datasetAsHTable(curvesChart.data, true, "curves");
 }
 
 
