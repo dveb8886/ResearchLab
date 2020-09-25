@@ -3,7 +3,7 @@
 }
 
 .tab-container {
-
+    width: 65%;
     border-color: red;
     border-style: solid;
 }
@@ -38,6 +38,11 @@
 
 .fund-preview {
     width: 65%;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
 }
 
 .fund-summary {

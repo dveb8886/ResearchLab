@@ -12,11 +12,14 @@
     <h1>{{ prof.prof_name }}</h1>
     <div>
         <div class="main-content-container">
-            <div class="tab-container">
-                <div class="tab" value="fund-attributes">Attributes</div>
-                <div class="tab" value="fund-alpha">Alpha</div>
-                <div class="tab" value="fund-curves">Curves</div>
-                <div class="tab" value="fund-beta">Beta</div>
+            <div class="header">
+                <div></div>
+                <div class="tab-container">
+                    <div class="tab" value="fund-attributes">Attributes</div>
+                    <div class="tab" value="fund-alpha">Alpha</div>
+                    <div class="tab" value="fund-curves">Curves</div>
+                    <div class="tab" value="fund-beta">Beta</div>
+                </div>
             </div>
             <div class="tab-content-container">
                 {% for fund in funds %}
@@ -42,11 +45,23 @@
                                 <button>Add Fund</button>
                             </div>
                         </div>
-                        <div class="fund-contents hidden">
-                            <td class="table_valueContainer"><input name="fund_manager" /></td>
-                            <td class="table_valueContainer"><input name="fund_vintage" value="2000"/></td>
-                            <td class="table_valueContainer"><input name="fund_nav" value="1,000.00"/></td>
-                            <td class="table_valueContainer"><input name="fund_unfunded" value="1,000.00" /></td>
+                        <div class="fund-contents">
+                            <table class="table_tag">
+                                <tbody>
+                                    <tr>
+                                        <th class="table_colHeader">Fund Manager</th>
+                                        <th class="table_colHeader">Fund Vintage</th>
+                                        <th class="table_colHeader">Fund NAV</th>
+                                        <th class="table_colHeader">Fund Unfunded</th>
+                                    </tr>
+                                    <tr class="table_row">
+                                        <td class="table_valueContainer"><input name="fund_manager" /></td>
+                                        <td class="table_valueContainer"><input name="fund_vintage" value="2000"/></td>
+                                        <td class="table_valueContainer"><input name="fund_nav" value="1,000.00"/></td>
+                                        <td class="table_valueContainer"><input name="fund_unfunded" value="1,000.00" /></td>
+                                    </tr>
+                                </tbody>
+                            </table>
                         </div>
                     </div>
                 </form>
@@ -60,8 +75,10 @@
             </div>
         </div>
     </div>
+
+    <!-- Old profile page -->
     <br />
-    <div>
+    <div style="display: none;">
         <h1>Old Part of page</h1>
         <h4>Funds</h4>
         <div>

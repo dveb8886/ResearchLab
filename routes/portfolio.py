@@ -11,7 +11,7 @@ def portfolio(portfolio_id):
 
 @portfolio_api.route('/add', methods=['post'])
 def add():
-    portfolio_name = request.form['prof_name']
+    portfolio_name = request.form['portfolio_name']
     org_id = request.form['org_id']
     controller.addPortfolio(portfolio_name, org_id)
     return redirect(url_for('organization_api.org', org_id=org_id))
