@@ -33,7 +33,7 @@ def add():
     fund_unfunded = request.form['fund_unfunded']
 
     controller.addFund(fund_name, fund_manager, fund_vintage, fund_nav, fund_unfunded, prof_id)
-    return redirect(url_for('profile_api.prof', prof_id=prof_id))
+    return redirect(url_for('portfolio_api.portfolio', portfolio_id=prof_id))
 
 @fund_api.route('/calc', methods=["post"])
 def graph_calc():

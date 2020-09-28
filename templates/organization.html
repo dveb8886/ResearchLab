@@ -14,11 +14,11 @@
     <div>
         <ol>
         {% for profile in profiles %}
-            <li><a href="{{ url_for('profile_api.prof', prof_id=profile.id) }}">{{ profile.prof_name }}</a></li>
+            <li><a href="{{ url_for('portfolio_api.portfolio', portfolio_id=profile.id) }}">{{ profile.prof_name }}</a></li>
         {% endfor %}
         </ol>
-        <form action="{{ url_for('profile_api.add') }}" method="post">
-            <input name="prof_name" />
+        <form action="{{ url_for('portfolio_api.add') }}" method="post">
+            <input name="portfolio_name" />
             <input name="org_id" hidden="true" value="{{ org.id }}" />
             <button>Add Portfolio</button>
         </form>
