@@ -5,3 +5,7 @@ create table if not exists value (
     x_date int,
     y_value real
 );
+
+-- :name value_add :insert
+insert into value (stat, x_date, y_value)
+values (:stat, :x_date, :y_value);

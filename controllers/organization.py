@@ -6,6 +6,7 @@ class OrganizationController():
     def __init__(self):
         pass
 
+
     def index(self):
         orgs = Organization.list()
         return list(orgs)

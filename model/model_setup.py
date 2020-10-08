@@ -1,5 +1,10 @@
 import pugsql
 import general.settings as settings
+from model.organization import Organization
+from model.user import User
+from model.profile import Profile
+from model.fund import Fund
+from model.role import Role
 
 def init():
     handler = pugsql.module('assets/sql')
@@ -13,14 +18,19 @@ def init():
     handler.fund_create()
     handler.stat_create()
     handler.value_create()
+    handler.role_create()
+    handler.role_user_create()
 
     # Add test rows if they don't exist
     org = handler.org_find(id=1)
     if (org == None):
-        handler.org_add(org_name='Test Company')
-        handler.user_add(id=1, user_name='Test User', org=1)
-        handler.prof_add(id=1, prof_name='Test Profile', org=1)
-        handler.fund_add(id=1, fund_name='Test Fund', fund_manager="Test Manager", fund_vintage=2000, fund_nav=0.00, fund_unfunded=0.00, prof=1)
+        org = Organization.add('Test Company')
+        admin = User.add('admin', 'test123')
+        guest = User.add('guest', 'test123')
+        admin_role = Role.add('admin')
+        admin.add_to_role(role_id=admin_role.id)
+        profile = Profile.add('Test Profile', org.id)
+        fund = Fund.add('Test Fund', 'Test Manager', 2000, 0.00, 0.00, profile.id)
 
     # return the queries handler
     return handler

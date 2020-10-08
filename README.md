@@ -4,6 +4,9 @@
 # Install Instructions
 - pip install flask
 - pip install pugsql
+- pip install miracle-acl
+- pip install flask-login
+- pip install flask-wtf
 
 # start flask web server
 - CD to home directory
