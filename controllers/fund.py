@@ -20,6 +20,39 @@ class FundController():
     def __init__(self):
         pass
 
+    # This function creates a new fund with default stats
+    def addFund(self, fund_name, fund_manager, fund_vintage, fund_nav, fund_unfunded, prof):
+        fund = Fund.add(fund_name, fund_manager, fund_vintage, fund_nav, fund_unfunded, prof)
+        x = x_values
+
+        stat_beta = Stat.add('Beta', fund.id)
+        stat_beta.set_values([x, beta_values])
+        stat_beta.commit_values()
+
+        stat_alpha = Stat.add('Alpha', fund.id)
+        stat_alpha.set_values([x, alpha_values])
+        stat_alpha.commit_values()
+
+        stat_rm = Stat.add('RM', fund.id)
+        stat_rm.set_values([x, rm_values])
+        stat_rm.commit_values()
+
+        stat_rf = Stat.add('RF', fund.id)
+        stat_rf.set_values([x, rf_values])
+        stat_rf.commit_values()
+
+        stat_c_rate = Stat.add('c_rate', fund.id)
+        stat_c_rate.set_values([x, c_values])
+        stat_c_rate.commit_values()
+
+        stat_d_rate = Stat.add('d_rate', fund.id)
+        stat_d_rate.set_values([x, d_values])
+        stat_d_rate.commit_values()
+        return fund
+
+
+
+
     def renderFund(self, fund_id):
         fund = Fund.find(fund_id)
         profile = Profile.find(fund.prof)
@@ -73,35 +106,7 @@ class FundController():
             'stats_calculated': stats_calculated
         }
 
-    # This function creates a new fund with default stats
-    def addFund(self, fund_name, fund_manager, fund_vintage, fund_nav, fund_unfunded, prof):
-        fund = Fund.add(fund_name, fund_manager, fund_vintage, fund_nav, fund_unfunded, prof)
-        x = x_values
 
-        stat_beta = Stat.add('Beta', fund.id)
-        stat_beta.set_values([x, beta_values])
-        stat_beta.commit_values()
-
-        stat_alpha = Stat.add('Alpha', fund.id)
-        stat_alpha.set_values([x, alpha_values])
-        stat_alpha.commit_values()
-
-        stat_rm = Stat.add('RM', fund.id)
-        stat_rm.set_values([x, rm_values])
-        stat_rm.commit_values()
-
-        stat_rf = Stat.add('RF', fund.id)
-        stat_rf.set_values([x, rf_values])
-        stat_rf.commit_values()
-
-        stat_c_rate = Stat.add('c_rate', fund.id)
-        stat_c_rate.set_values([x, c_values])
-        stat_c_rate.commit_values()
-
-        stat_d_rate = Stat.add('d_rate', fund.id)
-        stat_d_rate.set_values([x, d_values])
-        stat_d_rate.commit_values()
-        return fund
 
     # this function runs when the "Calculate" button is pressed on the UI.
     # sample dataset = {fund: #, x: [x1, x2], stats:{'Red':{y:[y1, y2]}, 'Blue':{y:[y1, y2]}}}

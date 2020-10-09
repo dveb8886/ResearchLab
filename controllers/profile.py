@@ -9,6 +9,8 @@ class ProfileController():
     def renderProf(self, prof_id):
         prof = Profile.find(prof_id)
         funds = Fund.list(prof_id)
+
+
         return prof, list(funds)
 
     def addProf(self, prof_name, org_id):

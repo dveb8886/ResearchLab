@@ -6,8 +6,8 @@ controller = PortfolioController()
 
 @portfolio_api.route('/<portfolio_id>')
 def portfolio(portfolio_id):
-    portfolio, funds = controller.renderPortfolio(portfolio_id)
-    return render_template('portfolio.html', funds=funds, prof=portfolio)
+    portfolio, data = controller.renderPortfolio(portfolio_id)
+    return render_template('portfolio.html', data=data, prof=portfolio)
 
 @portfolio_api.route('/add', methods=['post'])
 def add():
