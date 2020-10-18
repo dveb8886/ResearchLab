@@ -115,12 +115,10 @@ class FundController():
     #                       'Purple':{y:[y1, y2], color_line:'rgba(#, #, #, #)', color_fill:'rgba(#, #, #, #)'},
     #                       'Orange':{y:[y1, y2], color_line:'rgba(#, #, #, #)', color_fill:'rgba(#, #, #, #)'}
     #                    }}
-    def calcGraph(self, dataset):
-        x = dataset['x']
-        fund = dataset['fund']
-        fund_db = Fund.find(fund)
-        nav_value = fund_db.fund_nav
-        unfunded_value = fund_db.fund_unfunded
+    def calcGraph(self, dataset, fund_id):
+        fund_db = Fund.find(fund_id)
+        nav_value = 1000    #fund_db.fund_nav
+        unfunded_value = 1000   #fund_db.fund_unfunded
         fund_manager = fund_db.fund_manager
         vintage_value = fund_db.fund_vintage
 
@@ -131,17 +129,17 @@ class FundController():
         Called = []
         Distributed =[]
 
-        for i in range (len(x)):
-            growth_rate_quarterly = (dataset['stats']['Alpha']['y'][i] + dataset['stats']['RF']['y'][i] + dataset['stats']['Beta']['y'][i]*(dataset['stats']['RM']['y'][i]-dataset['stats']['RF']['y'][i]) )
+        for i in range (6):
+            growth_rate_quarterly = (dataset['Alpha'][i] + dataset['RF'][i] + dataset['Beta'][i]*(dataset['RM'][i]-dataset['RF'][i]))
             growth_rate.append(growth_rate_quarterly)
 
-            Called_quarter = unfunded_value * dataset['stats']['c_rate']['y'][i]
+            Called_quarter = unfunded_value * dataset['c_rate'][i]
             unfunded_value -= Called_quarter
             Unfunded.append(unfunded_value)
 
             Called.append(Called_quarter)
 
-            Distributed_quarter = nav_value * dataset['stats']['d_rate']['y'][i]
+            Distributed_quarter = nav_value * dataset['d_rate'][i]
 
             Distributed.append(Distributed_quarter)
 
@@ -151,13 +149,12 @@ class FundController():
             NAV.append(nav_value)
 
 
-        return {'fund': fund, 'x': x, 'stats':{
-            'growth_rate':  {'y': growth_rate,  'color_line': settings.colors['growth_rate']['color_line'], 'color_fill':   settings.colors['growth_rate']['color_fill']},
-            'NAV':          {'y': NAV,          'color_line': settings.colors['NAV']['color_line'], 'color_fill':           settings.colors['NAV']['color_fill']},
-            'Unfunded':     {'y': Unfunded,     'color_line': settings.colors['Unfunded']['color_line'], 'color_fill':      settings.colors['Unfunded']['color_fill']},
-            'Called':       {'y': Called,       'color_line': settings.colors['Called']['color_line'], 'color_fill':        settings.colors['Called']['color_fill']},
-            'Distributed':  {'y': Distributed,  'color_line': settings.colors['Distributed']['color_line'], 'color_fill':   settings.colors['Distributed']['color_fill']},
-
+        return {'fund': fund_id, 'x': 6, 'stats':{
+#           'growth_rate':  {'y': growth_rate,  'color_line': settings.colors['growth_rate']['color_line'], 'color_fill':   settings.colors['growth_rate']['color_fill']},
+            'NAV':          NAV,
+            'Unfunded':     Unfunded,
+            'Called':       Called,
+            'Distributed':  Distributed,
         }}
 
     # this function runs when the "Commit" button is pressed on the UI

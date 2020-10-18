@@ -1,6 +1,11 @@
 from model.profile import Profile
 from model.fund import Fund
 from model.stat import Stat
+from controllers.fund import FundController
+import general.settings as settings
+import numpy as np
+
+fund_controller = FundController()
 
 class PortfolioController():
 
@@ -14,7 +19,8 @@ class PortfolioController():
         stats_names = ['Beta', 'Alpha', 'RM', 'RF', 'c_rate', 'd_rate']
 
         data = {
-            'funds': []
+            'funds': [],
+            'portfolio': portfolio_id
         }
 
         for fund in funds:
@@ -42,3 +48,47 @@ class PortfolioController():
     def addPortfolio(self, prof_name, org_id):
         prof = Profile.add(prof_name, org_id)
         return prof
+
+    def calcGraph(self, dataset):
+
+        subTotalNav = []
+        subTotalUnfunded = []
+        subTotalCalled = []
+        subTotalDistributed = []
+
+        finalStat = {}
+        funds = []
+
+        for fund_id in dataset['funds']:
+            subTotalStat = fund_controller.calcGraph(dataset['funds'][fund_id], fund_id)
+            subTotalNav.append(subTotalStat['stats']['NAV'])
+            subTotalUnfunded.append(subTotalStat['stats']['Unfunded'])
+            subTotalCalled.append(subTotalStat['stats']['Called'])
+            subTotalDistributed.append(subTotalStat['stats']['Distributed'])
+
+            funds.append({
+                'fund_id': fund_id,
+                'stats': {
+                    'NAV': {'y': subTotalStat['stats']['NAV'], 'color_line': settings.colors['NAV']['color_line'],
+                            'color_fill': settings.colors['NAV']['color_fill']},
+                    'Unfunded': {'y': subTotalStat['stats']['Unfunded'], 'color_line': settings.colors['Unfunded']['color_line'],
+                                 'color_fill': settings.colors['Unfunded']['color_fill']},
+                    'Called': {'y': subTotalStat['stats']['Called'], 'color_line': settings.colors['Called']['color_line'],
+                               'color_fill': settings.colors['Called']['color_fill']},
+                    'Distributed': {'y': subTotalStat['stats']['Distributed'],
+                                    'color_line': settings.colors['Distributed']['color_line'],
+                                    'color_fill': settings.colors['Distributed']['color_fill']}
+                }
+            })
+
+        finalStat['NAV'] = np.sum(subTotalNav, axis=0).tolist()
+        finalStat['Unfunded'] = np.sum(subTotalUnfunded, axis=0).tolist()
+        finalStat['Called'] = np.sum(subTotalCalled, axis=0).tolist()
+        finalStat['Distributed'] = np.sum(subTotalDistributed, axis=0).tolist()
+
+        return {'x': 6, 'funds': funds, 'stats': {
+            'NAV': {'y': finalStat['NAV'],                 'color_line': settings.colors['NAV']['color_line'],         'color_fill': settings.colors['NAV']['color_fill']},
+            'Unfunded': {'y': finalStat['Unfunded'],       'color_line': settings.colors['Unfunded']['color_line'],    'color_fill': settings.colors['Unfunded']['color_fill']},
+            'Called': {'y': finalStat['Called'],           'color_line': settings.colors['Called']['color_line'],      'color_fill': settings.colors['Called']['color_fill']},
+            'Distributed': {'y': finalStat['Distributed'], 'color_line': settings.colors['Distributed']['color_line'], 'color_fill': settings.colors['Distributed']['color_fill']},
+        }}

@@ -24,6 +24,7 @@
                     <div class="tab" value="fund-alpha">Alpha</div>
                     <div class="tab" value="fund-curves">Curves</div>
                     <div class="tab" value="fund-beta">Beta</div>
+                    <div class="tab  fund-result" value="fund-results">Results</div>
                 </div>
             </div>
             <div class="tab-content-container">
@@ -33,12 +34,19 @@
                         <div class="fund-summary-item fund-name" fund="{{ fund['id'] }}">{{ fund['name'] }}</div>
                         <div class="fund-summary-item fund-preview">
                             <div class="fund-tab-item fund-attributes">Manager: {{ fund['manager'] }}</div>
+                            <div class="fund-tab-item hidden fund-alpha"><canvas width="300" height="15"></canvas></div>
+                            <div class="fund-tab-item hidden fund-curves"><canvas width="300" height="15"></canvas></div>
+                            <div class="fund-tab-item hidden fund-beta"><canvas width="300" height="15"></canvas></div>
+                            <div class="fund-tab-item hidden fund-results"><canvas width="300" height="15"></canvas></div>
+                        </div>
+                    </div>
+                    <div class="fund-contents hidden">
+                            <div class="fund-tab-item fund-attributes">Manager: {{ fund['manager'] }}</div>
                             <div class="fund-tab-item hidden fund-alpha"><canvas width="300" height="50"></canvas></div>
                             <div class="fund-tab-item hidden fund-curves"><canvas width="300" height="50"></canvas></div>
                             <div class="fund-tab-item hidden fund-beta"><canvas width="300" height="50"></canvas></div>
-                        </div>
+                            <div class="fund-tab-item hidden fund-results"><canvas width="300" height="50"></canvas></div>
                     </div>
-                    <div class="fund-contents hidden">(bigger graph and table)</div>
                 </div>
                 {% endfor %}
                 <form action="{{ url_for('fund_api.add') }}" method="post">
@@ -62,8 +70,8 @@
                                     <tr class="table_row">
                                         <td class="table_valueContainer"><input name="fund_manager" /></td>
                                         <td class="table_valueContainer"><input name="fund_vintage" value="2000"/></td>
-                                        <td class="table_valueContainer"><input name="fund_nav" value="1,000.00"/></td>
-                                        <td class="table_valueContainer"><input name="fund_unfunded" value="1,000.00" /></td>
+                                        <td class="table_valueContainer"><input name="fund_nav" value="1000"/></td>
+                                        <td class="table_valueContainer"><input name="fund_unfunded" value="1000" /></td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -72,11 +80,11 @@
                 </form>
             </div>
             <div class="button-controls">
-                <button>Calculate</button>
+                <button type="button" onclick="calcGraph()">Calculate</button>
                 <button>Commit</button>
             </div>
             <div class="result-content">
-                Results will go here
+                <canvas id="calcChart" width="300", height="100"></canvas>
             </div>
         </div>
     </div>

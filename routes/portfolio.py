@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, url_for, redirect
+from flask import Blueprint, render_template, request, url_for, redirect, jsonify
 from controllers.portfolio import PortfolioController
 
 portfolio_api = Blueprint('portfolio_api', __name__)
@@ -15,3 +15,8 @@ def add():
     org_id = request.form['org_id']
     controller.addPortfolio(portfolio_name, org_id)
     return redirect(url_for('organization_api.org', org_id=org_id))
+
+@portfolio_api.route('/calc', methods=["post"])
+def graph_calc():
+    # return ''
+    return jsonify(controller.calcGraph(request.json))
