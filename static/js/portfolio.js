@@ -57,13 +57,9 @@ function datasetAsHTable(dataset, interactable, graphName){
     } else {
         html += '<tr> <th>['+count+']</th> </tr>';
     }
-    console.log('start');
-    console.log(dataset);
     for (var item of dataset.datasets){
-        console.log(item.label);
         html += '<tr style="background-color: #f00" class="table_row"><td class="table_rowHeader">'+item.label+'</td></tr>'; // row header
     }
-    console.log('end');
 
     html += '</table>';
     html += '</div>';
@@ -80,12 +76,8 @@ function datasetAsHTable(dataset, interactable, graphName){
     var idx = 0;
     for (var item of dataset.datasets){
         html += '<tr style="background-color: '+item.backgroundColor+'" class="table_row">'; // row header
-//        console.log("new row")
-        console.log(dataset.datasets[idx])
         for (i=0; i<columnCount; i++){
             value = dataset.datasets[idx].data[i]
-//            console.log(" new val")
-//            console.log(value)
             if (interactable){
                 html += '<td class="table_valueContainer"><input class="table_value input" onkeydown="changeValue(this)" type="text" dataset="'+idx+'" index="'+i+'" graphName="'+graphName+'" value="'+value.toFixed(3)+'"></td>';
             } else {
@@ -101,7 +93,6 @@ function datasetAsHTable(dataset, interactable, graphName){
     html += '</table>';
     html += '</div>';
     html += '</div>';
-    console.log(html);
     return html;
 }
 
@@ -259,15 +250,12 @@ function calcGraph(){
         body['funds'][fund_id] = stat_dict;
     }
 
-    console.log(body);
-
      $.ajax({
         url: "/portfolio/calc",
         type: "POST",
         data: JSON.stringify(body),
         contentType: 'application/json',
         success: function(response){
-            console.log(response)
             updateAllResultGraph(response);
             $('.fund-result').removeClass('hidden');
             //            calcchartdiv.innerHTML = datasetAsHTable(calcChart.data, false);
