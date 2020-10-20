@@ -31,7 +31,7 @@
                 {% for fund in data['funds'] %}
                 <div class="fund-container" fund="{{ fund['id'] }}">
                     <div class="fund-summary">
-                        <div class="fund-summary-item fund-name" fund="{{ fund['id'] }}">{{ fund['name'] }}</div>
+                        <div class="fund-summary-item fund-name" fund="{{ fund['id'] }}">{{ fund['name'] }}<button type="button" onclick="deleteFund({{ fund['id'] }})">Delete</button></div>
                         <div class="fund-summary-item fund-preview">
                             <div class="fund-tab-item fund-attributes">Manager: {{ fund['manager'] }}</div>
                             <div class="fund-tab-item hidden fund-alpha"><canvas width="300" height="15"></canvas></div>

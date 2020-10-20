@@ -179,3 +179,8 @@ class FundController():
             stat.commit()
             stat.commit_values()
         return 'success'
+
+    def delete(self, fund_id):
+        Fund.delete(fund_id)
+        stat
+        return 'success'

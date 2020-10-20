@@ -74,3 +74,65 @@
     border-color: red;
     border-style: solid;
 }
+
+/* CSS of the table */
+.table_tag, th, td {
+    border-collapse: collapse;
+    border: 1px solid #03A;
+}
+
+.table_colHeader {
+
+}
+
+.table_rowHeader {
+
+}
+
+.table_row {
+
+}
+
+.table_valueContainer {
+    text-align: right;
+    padding: 0px;
+}
+
+.table_value {
+    width: 60px;
+}
+
+.table_value.input {
+    text-align: right;
+    background-color: rgba(0,0,0,0);
+    border-style: none;
+    padding-top: 2px;
+    padding-bottom: 3px;
+    padding-right: 2px;
+}
+
+.table_value.fixed {
+    padding-top: 1px;
+    padding-bottom: 1px;
+    padding-right: 3px;
+}
+
+.table_container {
+    display: flex;
+}
+
+.table_row_header {
+
+}
+
+.table_data_container {
+    overflow: auto;
+    flex: 1;
+}
+
+.table_size.input {
+    padding: 0px;
+    border-style: none;
+    width: 40px;
+    text-align: center;
+}

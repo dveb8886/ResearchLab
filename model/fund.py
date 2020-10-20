@@ -35,5 +35,9 @@ class Fund:
             result.append(Fund(item))
         return result
 
+    @staticmethod
+    def delete(fund_id):
+        result = settings.sql.fund_delete(fund_id=fund_id)
+
     def change(self, fields):
         pass

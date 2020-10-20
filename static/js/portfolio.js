@@ -6,6 +6,22 @@ function map(value, start1, stop1, start2, stop2) {
 }
 
 /**
+ * Delete a fund button
+ */
+function deleteFund(fund_id){
+
+    $.ajax({
+        url: "/fund/delete/"+fund_id,
+        type: "GET",
+        contentType: 'application/json',
+        success: function(response){
+            $( '.fund-container[fund=\''+fund_id+'\']' ).remove();
+        }
+    });
+}
+
+
+/**
  * This function takes the location of a mouse click within a graph, and returns the
  *  in-graph y-coordinate of that mouse click
  */

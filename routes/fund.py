@@ -42,3 +42,7 @@ def graph_calc():
 @fund_api.route('/commit', methods=["post"])
 def commit_graph():
     return jsonify(controller.commitGraph(request.json))
+
+@fund_api.route('/delete/<fund_id>')
+def delete(fund_id):
+    return jsonify(controller.delete(fund_id))
