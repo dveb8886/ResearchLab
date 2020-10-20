@@ -43,6 +43,71 @@ function getChartMouseUpFunc(chart, chart0){
     }
 }
 
+
+/**
+ * This function creates a table based on a dataset
+ */
+function datasetAsHTable(dataset, interactable, graphName){
+    var html = '<div class="table_container">';
+    html += '<div class="table_row_header">';
+    html += '<table class="table_tag">';
+    count = dataset.labels.length;
+    if (interactable){
+        html += '<tr> <th><input onkeydown="resizeSetupGraph(this)" class="table_size input" value="'+count+'" /></th> </tr>';
+    } else {
+        html += '<tr> <th>['+count+']</th> </tr>';
+    }
+    console.log('start');
+    console.log(dataset);
+    for (var item of dataset.datasets){
+        console.log(item.label);
+        html += '<tr style="background-color: #f00" class="table_row"><td class="table_rowHeader">'+item.label+'</td></tr>'; // row header
+    }
+    console.log('end');
+
+    html += '</table>';
+    html += '</div>';
+
+    html += '<div class="table_data_container">';
+    html += '<table class="table_tag">';
+
+    var columnCount = 0;
+    for (var item of dataset.labels){
+        html += '<th class="table_colHeader">'+item+'</th>'; // column header
+        columnCount += 1;
+    }
+
+    var idx = 0;
+    for (var item of dataset.datasets){
+        html += '<tr style="background-color: '+item.backgroundColor+'" class="table_row">'; // row header
+//        console.log("new row")
+        console.log(dataset.datasets[idx])
+        for (i=0; i<columnCount; i++){
+            value = dataset.datasets[idx].data[i]
+//            console.log(" new val")
+//            console.log(value)
+            if (interactable){
+                html += '<td class="table_valueContainer"><input class="table_value input" onkeydown="changeValue(this)" type="text" dataset="'+idx+'" index="'+i+'" graphName="'+graphName+'" value="'+value.toFixed(3)+'"></td>';
+            } else {
+                html += '<td class="table_valueContainer"><div class="table_value fixed" dataset="'+idx+'" index="'+i+'">'+value.toFixed(3)+'</div></td>';
+            }
+
+        }
+        html += '</tr>';
+        idx += 1;
+    }
+
+    html += '</tr>';
+    html += '</table>';
+    html += '</div>';
+    html += '</div>';
+    console.log(html);
+    return html;
+}
+
+/**
+ * This function generates the small and big charts for all parameters and results. Only the big chart is listening to the mouse drags.
+ */
 function createCharts(fund_id, chartStat, stats){
 
         var Canvas0 = $('canvas', $(chartStat, $('[fund='+fund_id+']')))[0];
@@ -174,6 +239,8 @@ function updateAllResultGraph(ds){
         };
         fundChart.update();
         fundChart0.update();
+        table = $('.table', $( '.fund-results', $('[fund='+fund['fund_id']+']')))
+        table.html(datasetAsHTable(fundChart.data, true, "market"));
     }
 }
 
@@ -203,7 +270,7 @@ function calcGraph(){
             console.log(response)
             updateAllResultGraph(response);
             $('.fund-result').removeClass('hidden');
-//            calcchartdiv.innerHTML = datasetAsHTable(calcChart.data, false);
+            //            calcchartdiv.innerHTML = datasetAsHTable(calcChart.data, false);
         }
     });
 }
@@ -244,10 +311,19 @@ window.addEventListener('load', function(){
 
         chart = createCharts(fund_id, '.fund-alpha', ['RF', 'RM', 'Alpha']);
         allChartList[fund_id].push(chart);
+        table = $('.table', $( '.fund-alpha', $('[fund='+fund_id+']')))
+        table.html(datasetAsHTable(chart[1].data, true, "market"));
+
         chart = createCharts(fund_id, '.fund-beta', ['Beta']);
         allChartList[fund_id].push(chart);
+        table = $('.table', $( '.fund-beta', $('[fund='+fund_id+']')))
+        table.html(datasetAsHTable(chart[1].data, true, "market"));
+
         chart = createCharts(fund_id, '.fund-curves', ['c_rate', 'd_rate']);
         allChartList[fund_id].push(chart);
+        table = $('.table', $( '.fund-curves', $('[fund='+fund_id+']')))
+        table.html(datasetAsHTable(chart[1].data, true, "market"));
+
         chart = createCharts(fund_id, '.fund-results', []);
         allChartList[fund_id].push(chart);
 

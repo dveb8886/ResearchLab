@@ -24,7 +24,7 @@
                     <div class="tab" value="fund-alpha">Alpha</div>
                     <div class="tab" value="fund-curves">Curves</div>
                     <div class="tab" value="fund-beta">Beta</div>
-                    <div class="tab  fund-result" value="fund-results">Results</div>
+                    <div class="tab hidden fund-result" value="fund-results">Results</div>
                 </div>
             </div>
             <div class="tab-content-container">
@@ -42,10 +42,22 @@
                     </div>
                     <div class="fund-contents hidden">
                             <div class="fund-tab-item fund-attributes">Manager: {{ fund['manager'] }}</div>
-                            <div class="fund-tab-item hidden fund-alpha"><canvas width="300" height="50"></canvas></div>
-                            <div class="fund-tab-item hidden fund-curves"><canvas width="300" height="50"></canvas></div>
-                            <div class="fund-tab-item hidden fund-beta"><canvas width="300" height="50"></canvas></div>
-                            <div class="fund-tab-item hidden fund-results"><canvas width="300" height="50"></canvas></div>
+                            <div class="fund-tab-item hidden fund-alpha">
+                                <canvas width="300" height="50"></canvas>
+                                <div class="table"></div>
+                            </div>
+                            <div class="fund-tab-item hidden fund-curves">
+                                <canvas width="300" height="50"></canvas>
+                                 <div class="table"></div>
+                            </div>
+                            <div class="fund-tab-item hidden fund-beta">
+                                <canvas width="300" height="50"></canvas>
+                                 <div class="table"></div>
+                            </div>
+                            <div class="fund-tab-item hidden fund-results">
+                                <canvas width="300" height="50"></canvas>
+                                 <div class="table"></div>
+                            </div>
                     </div>
                 </div>
                 {% endfor %}
