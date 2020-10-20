@@ -21,6 +21,9 @@ class Stat:
     def __repr__(self):
         return self.__str__()
 
+    def get_resource(self):
+        return 'stat_'+self.id
+
     # retrieves from database and updates local
     def retrieve_stored_values(self):
         lst = list(settings.sql.stat_readvalues(stat_id=self.id))

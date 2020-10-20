@@ -8,34 +8,41 @@
 <body>
     <div class="header">
         <div class="left">
-            <p>Header</p>
+            <div class="header-text">
+                {% block header %}this text should be overridden{% endblock %}
+            </div>
         </div>
-        <div class="right">
-            {% if current_user.is_anonymous %}
-            <p>
+
+        {% if current_user.is_anonymous %}
+        <div class="menuarea">
                 <a href="{{ url_for('account_api.register') }}">Register</a>
                 <a href="{{ url_for('account_api.login') }}">Login</a>
-            </p>
-            {% else %}
-            <div class="dropdown">
-                <button class="dropbtn">Menu</button>
-                <div class="dropdown-content">
-                    Welcome <b>{{ current_user.username }}</b><br />
-
-                    {% if acl.check_any(roles, 'admin_menu', 'view') %}
-                    <span class="dropdown-header">Admin Menu</span>
-                    <a href="{{ url_for('account_api.add_role') }}">Add Role</a>
-                    <a href="{{ url_for('account_api.add_to_role') }}">Add User to Role</a>
-                    {% endif %}
-
-                    <span class="dropdown-header">User Menu</span>
-                    <a href="{{ url_for('account_api.changepass') }}">Change Password</a>
-                    <a href="{{ url_for('account_api.logout') }}">Logout</a>
-                </div>
-            </div>
-            {% endif %}
         </div>
+        {% else %}
+        <div class="dropdown">
+            <button class="dropbtn">Menu</button>
+            <div class="dropdown-content">
+                Welcome <b>{{ current_user.username }}</b><br />
 
+                {% if acl.check_any(roles, 'admin_menu', 'view') %}
+                <span class="dropdown-header">Super Admin</span>
+                <a href="{{ url_for('account_api.add_role') }}">Add Role</a>
+                <a href="{{ url_for('account_api.add_to_role') }}">Add User to Role</a>
+                {% endif %}
+
+                {% block adminmenu %}{% endblock %}
+
+                <span class="dropdown-header">User</span>
+                <a href="{{ url_for('organization_api.all') }}">My Organizations</a>
+                <a href="{{ url_for('account_api.changepass') }}">Change Password</a>
+                <a href="{{ url_for('account_api.logout') }}">Logout</a>
+            </div>
+        </div>
+        {% endif %}
+
+    </div>
+    <div class="breadcrumb">
+        {% block breadcrumb %}Breadcrumb not defined{% endblock %}
     </div>
     {% block content %}{% endblock %}
 </body>

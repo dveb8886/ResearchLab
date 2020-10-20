@@ -14,6 +14,9 @@ class Role:
     def __repr__(self):
         return self.__str__()
 
+    def get_resource(self):
+        return 'role_'+self.id
+
     @staticmethod
     def add(name):
         id = settings.sql.role_add(name=name, active=1)

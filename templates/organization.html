@@ -1,10 +1,13 @@
-
 {% extends "base.html" %}
-
+{% block header %}{{ org.org_name }}{% endblock %}
+{% block breadcrumb %}<a href="{{ url_for('organization_api.all') }}">My Organizations</a>{% endblock %}
+{% block adminmenu %}
+    {% if acl.check_any(roles, org.get_resource()+'_admin_menu', 'view') %}
+        <span class="dropdown-header">Organization Admin</span>
+        <a href="{{ url_for('account_api.add_role') }}">Permissions</a>
+    {% endif %}
+{% endblock %}
 {% block content %}
-
-
-    <h1>{{ org.org_name }}</h1>
     <h4>Portfolios</h4>
     <div>
         <ol>
@@ -18,5 +21,4 @@
             <button>Add Portfolio</button>
         </form>
     </div>
-
 {% endblock %}

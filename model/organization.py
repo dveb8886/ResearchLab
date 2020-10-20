@@ -1,6 +1,8 @@
 import general.settings as settings
+from model.base_mdl import BaseMdl
 
-class Organization:
+
+class Organization(BaseMdl):
 
     def __init__(self, field_dict):
         self.id = field_dict["id"]
@@ -11,6 +13,9 @@ class Organization:
 
     def __repr__(self):
         return self.__str__()
+
+    def get_resource(self):
+        return 'org_'+str(self.id)
 
     @staticmethod
     def add(org_name):

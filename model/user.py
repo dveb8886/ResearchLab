@@ -17,6 +17,9 @@ class User(UserMixin):
     def __repr__(self):
         return self.__str__()
 
+    def get_resource(self):
+        return 'user_'+self.id
+
     def set_password(self, password):
         self.password = generate_password_hash(password)
         settings.sql.user_changepass(id=self.id, password=self.password)

@@ -4,6 +4,7 @@ from miracle import Acl
 import functools
 from flask import render_template
 
+
 def acl_resource(resource=None, permission=None, grants=None):
     def _decorator(func):
         @functools.wraps(func)
@@ -26,6 +27,7 @@ def acl_resource(resource=None, permission=None, grants=None):
 
         return wrapper
     return _decorator
+
 
 def gen_acl():
     acl = Acl()

@@ -13,6 +13,9 @@ class Profile:
     def __repr__(self):
         return self.__str__()
 
+    def get_resource(self):
+        return 'prof_'+self.id
+
     @staticmethod
     def add(prof_name, org_id):
         id = settings.sql.prof_add(prof_name=prof_name, org=org_id)
