@@ -99,5 +99,10 @@ class Stat:
             result.append(Stat(item))
         return result
 
+#Added by DB
+    @staticmethod
+    def delete(fund_id):
+        result = settings.sql.stat_delete(fund_id=fund_id)
+
     def change(self, fields):
         pass

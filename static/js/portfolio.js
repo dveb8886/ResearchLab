@@ -6,6 +6,18 @@ function map(value, start1, stop1, start2, stop2) {
 }
 
 /**
+ * This function takes the location of a mouse click within a graph, and returns the
+ *  in-graph y-coordinate of that mouse click
+ */
+function getValueY(e, chart){
+    const helpers = Chart.helpers;
+    var pos = helpers.getRelativePosition(e, chart);
+    var chartArea = chart.chartArea;
+    var yAxis = chart.scales['y-axis-0'];
+    return map(pos.y, chartArea.bottom, chartArea.top, yAxis.min, yAxis.max);
+}
+
+/**
  * Delete a fund button
  */
 function deleteFund(fund_id){
@@ -21,18 +33,6 @@ function deleteFund(fund_id){
 }
 
 
-/**
- * This function takes the location of a mouse click within a graph, and returns the
- *  in-graph y-coordinate of that mouse click
- */
-function getValueY(e, chart){
-    const helpers = Chart.helpers;
-    var pos = helpers.getRelativePosition(e, chart);
-    var chartArea = chart.chartArea;
-    var yAxis = chart.scales['y-axis-0'];
-    return map(pos.y, chartArea.bottom, chartArea.top, yAxis.min, yAxis.max);
-}
-
 dIndex = -1;
 cIndex = -1;
 
@@ -46,12 +46,14 @@ function getChartMouseDownFunc(chart){
     }
 }
 
-function getChartMouseUpFunc(chart, chart0){
+function getChartMouseUpFunc(chart, chart0, chartStat, fund_id){
     return function(e){
         var yValue = getValueY(e, chart)
+        var table = $('.table', $( chartStat, $('[fund='+fund_id+']')))
         if (dIndex > -1){
             var data = chart.data;
             data.datasets[dIndex].data[cIndex] = yValue;
+            updateDatasetAsHTable(table, chart.data, true);
             chart.update();
             chart0.update();
             dIndex = -1;
@@ -59,11 +61,30 @@ function getChartMouseUpFunc(chart, chart0){
     }
 }
 
+/**
+ * This function updates the dataset within an already existing table
+ */
+function updateDatasetAsHTable(table, dataset, interactable){
+    var values = $(table).find(".table_value");
+    for (var value of values){
+        dIndex = value.getAttribute('dataset');
+        vIndex = value.getAttribute('index');
+        oldValue = value.value;
+        newValue = dataset.datasets[dIndex].data[vIndex].toFixed(3);
+        if (oldValue != newValue){
+            value.value = newValue;
+            value.scrollIntoView({block: 'nearest', inline: 'center', behavior: 'smooth'});
+            $(value).css("background-color", "rgba(255, 255, 0, 1)");
+            value.setAttribute('fadebackground', '1');
+        }
+
+    }
+}
 
 /**
  * This function creates a table based on a dataset
  */
-function datasetAsHTable(dataset, interactable, graphName){
+function datasetAsHTable(dataset, interactable, fund_id, chart_id){
     var html = '<div class="table_container">';
     html += '<div class="table_row_header">';
     html += '<table class="table_tag">';
@@ -95,7 +116,7 @@ function datasetAsHTable(dataset, interactable, graphName){
         for (i=0; i<columnCount; i++){
             value = dataset.datasets[idx].data[i]
             if (interactable){
-                html += '<td class="table_valueContainer"><input class="table_value input" onkeydown="changeValue(this)" type="text" dataset="'+idx+'" index="'+i+'" graphName="'+graphName+'" value="'+value.toFixed(3)+'"></td>';
+                html += '<td class="table_valueContainer"><input fund="'+fund_id+'" chart="'+chart_id+'" class="table_value input" onkeydown="changeValue(this)" type="text" dataset="'+idx+'" index="'+i+'" value="'+value.toFixed(3)+'"></td>';
             } else {
                 html += '<td class="table_valueContainer"><div class="table_value fixed" dataset="'+idx+'" index="'+i+'">'+value.toFixed(3)+'</div></td>';
             }
@@ -110,6 +131,24 @@ function datasetAsHTable(dataset, interactable, graphName){
     html += '</div>';
     html += '</div>';
     return html;
+}
+
+/**
+ * This function executes when you change the numbers directly in the top table
+ * Such a change results in the top graph updating
+ */
+function changeValue(ele){
+    if (event.key === 'Enter' || event.key === 'Tab'){
+        datasetIndex = ele.getAttribute("dataset");
+        valueIndex = ele.getAttribute("index");
+        fund_id = parseInt(ele.getAttribute("fund"));
+        chart_id = parseInt(ele.getAttribute("chart"));
+        var chart = allChartList[fund_id][chart_id][0];
+        var data = chart.data;
+        data.datasets[datasetIndex].data[valueIndex] = parseFloat(ele.value);
+        chart.update();
+        allChartList[fund_id][chart_id][1].update();
+    }
 }
 
 /**
@@ -175,7 +214,7 @@ function createCharts(fund_id, chartStat, stats){
 
 
         Canvas1.onmousedown = getChartMouseDownFunc(chart1)
-        Canvas1.onmouseup = getChartMouseUpFunc(chart1, chart0)
+        Canvas1.onmouseup = getChartMouseUpFunc(chart1, chart0, chartStat, fund_id)
 
         return [chart0, chart1];
 }
@@ -247,7 +286,7 @@ function updateAllResultGraph(ds){
         fundChart.update();
         fundChart0.update();
         table = $('.table', $( '.fund-results', $('[fund='+fund['fund_id']+']')))
-        table.html(datasetAsHTable(fundChart.data, true, "market"));
+        table.html(datasetAsHTable(fundChart.data, true));
     }
 }
 
@@ -316,17 +355,17 @@ window.addEventListener('load', function(){
         chart = createCharts(fund_id, '.fund-alpha', ['RF', 'RM', 'Alpha']);
         allChartList[fund_id].push(chart);
         table = $('.table', $( '.fund-alpha', $('[fund='+fund_id+']')))
-        table.html(datasetAsHTable(chart[1].data, true, "market"));
+        table.html(datasetAsHTable(chart[1].data, true, fund_id, 0));
 
         chart = createCharts(fund_id, '.fund-beta', ['Beta']);
         allChartList[fund_id].push(chart);
         table = $('.table', $( '.fund-beta', $('[fund='+fund_id+']')))
-        table.html(datasetAsHTable(chart[1].data, true, "market"));
+        table.html(datasetAsHTable(chart[1].data, true, fund_id, 1));
 
         chart = createCharts(fund_id, '.fund-curves', ['c_rate', 'd_rate']);
         allChartList[fund_id].push(chart);
         table = $('.table', $( '.fund-curves', $('[fund='+fund_id+']')))
-        table.html(datasetAsHTable(chart[1].data, true, "market"));
+        table.html(datasetAsHTable(chart[1].data, true, fund_id, 2));
 
         chart = createCharts(fund_id, '.fund-results', []);
         allChartList[fund_id].push(chart);
@@ -334,5 +373,23 @@ window.addEventListener('load', function(){
     }
 
     createCalcChart();
+
+    // Interval: creates the fading highlight effect on recently updated cells
+    window.setInterval(function(){
+        var fadecells = $(".table_value[fadebackground]");
+        //console.log('fade');
+        for (var cell of fadecells){
+            //console.log('a cell in fade');
+            var alpha = parseFloat(cell.getAttribute('fadebackground'));
+            alpha -= 0.1;
+            if (alpha < 0) alpha = 0;
+            $(cell).css("background-color", "rgba(255, 255, 0, "+alpha+")");
+            if (alpha == 0){
+                cell.removeAttribute('fadebackground');
+            } else {
+                cell.setAttribute('fadebackground', alpha);
+            }
+        }
+    }, 200);
 
 })

@@ -180,7 +180,9 @@ class FundController():
             stat.commit_values()
         return 'success'
 
+
+# Modified y DB
     def delete(self, fund_id):
         Fund.delete(fund_id)
-        stat
+        Stat.delete(fund_id)
         return 'success'
