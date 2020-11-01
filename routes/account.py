@@ -5,8 +5,10 @@ from flask_login import LoginManager, current_user, login_user, logout_user, log
 from werkzeug.urls import url_parse
 from model.user import User
 from model.role import Role
+from controllers.account import AccountController
 
 account_api = Blueprint('account_api', __name__)
+controller = AccountController()
 
 @account_api.route('/login', methods=['GET', 'POST'])
 def login():
@@ -145,3 +147,12 @@ def add_role_api(role_name):
     Role.add(role_name)
     return ''
 
+
+@account_api.route('/search_users/<query>/<resource>')
+def search_user(query, resource):
+    return jsonify(controller.user_search(query, resource))
+
+
+@account_api.route('/save_roles', methods=['POST'])
+def save_roles():
+    return jsonify(controller.save_roles(request.json))

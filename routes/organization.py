@@ -52,3 +52,16 @@ def add():
     # return html
     return redirect(url_for('organization_api.all'))
 
+@organization_api.route('/<org_id>/permissions')
+@login_required
+@acl_resource(resource='org_{org_id}', permission='read', grants=[
+    '{resource}_admin',
+    '{resource}_user'
+])
+def acl(org_id):
+    org, profiles = controller.renderOrg(org_id)
+
+    # grant permission to org admin to see admin menu
+    g.acl.grant(org.get_resource() + '_admin', org.get_resource() + '_admin_menu', 'view')
+
+    return render_template('organization_acl.html', org=org)

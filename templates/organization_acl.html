@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block htmlhead %}
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/orgacl.css') }}">
+    <script src="{{ url_for('static', filename='js/jquery-3.4.1.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/orgacl.js') }}"></script>
+{% endblock %}
+{% block header %}{{ org.org_name }} - Permissions{% endblock %}
+{% block breadcrumb %}
+    <a href="{{ url_for('organization_api.all') }}">My Organizations</a>
+    >
+    <a href="{{ url_for('organization_api.org', org_id=org.id) }}">{{ org.org_name }}</a>
+{% endblock %}
+{% block adminmenu %}
+    {% if acl.check_any(roles, org.get_resource()+'_admin_menu', 'view') %}
+        <span class="dropdown-header">Organization Admin</span>
+        <a href="{{ url_for('account_api.add_role') }}">Permissions</a>
+    {% endif %}
+{% endblock %}
+{% block content %}
+    <h4>Permissions</h4>
+    <div class="search" resource="{{ org.get_resource() }}">
+        <input name="search-users" value="*" />
+        <button>Search</button>
+    </div>
+    <table id="user-list">
+        <tbody>
+            <!-- Javascript Generated List Appears Here -->
+        </tbody>
+    </table>
+    <button class="btn-save-roles">Save Roles</button>
+    <div id="user-header-sample" style="display: none;">
+        <table></tbody>
+            <tr>
+                <th class="h-name">Name</th>
+                <th class="h-role"><!-- Javascript Generated Role Name --></th>
+                <!-- Javascript Repeats h-role -->
+            </tr>
+        </tbody></table>
+    </div>
+    <div id="user-row-sample" style="display: none;">
+        <table><tbody>
+            <tr class="table-row">
+                <td class="table-cell user-name">Tim</td>
+                <td class="table-cell user-role"><input type="checkbox"></td>
+                <!-- Javascript Repeats user-role -->
+            </tr>
+        </tbody></table>
+    </div>
+{% endblock %}

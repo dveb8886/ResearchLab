@@ -67,6 +67,21 @@ class User(UserMixin):
         result = settings.sql.user_find_byname(username=username)
         return None if result is None else User(result)
 
+    @staticmethod
+    def search(search_term):
+        lst = settings.sql.user_search(search='%'+search_term+'%')
+        result = []
+        for item in lst:
+            result.append(User(item))
+        return result
+
+    @staticmethod
+    def get_many_users_by_ids(user_ids):
+        lst = settings.sql.user_get_many_by_id(user_ids=user_ids)
+        result = []
+        for item in lst:
+            result.append(User(item))
+        return result
 
     def change(self, fields):
         pass

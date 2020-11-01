@@ -18,3 +18,9 @@ select * from user where id = :id;
 
 -- :name user_find_byname :one
 select * from user where username = :username;
+
+-- :name user_search :many
+select * from user where username like :search;
+
+-- :name user_get_many_by_id :many
+select * from user where id in :user_ids

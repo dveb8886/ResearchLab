@@ -4,7 +4,7 @@
 {% block adminmenu %}
     {% if acl.check_any(roles, org.get_resource()+'_admin_menu', 'view') %}
         <span class="dropdown-header">Organization Admin</span>
-        <a href="{{ url_for('account_api.add_role') }}">Permissions</a>
+        <a href="{{ url_for('organization_api.acl', org_id=org.id) }}">Permissions</a>
     {% endif %}
 {% endblock %}
 {% block content %}

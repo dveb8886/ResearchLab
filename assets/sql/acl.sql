@@ -38,32 +38,20 @@ where user_id = :user_id and role_id = :role_id
 
 -- :name enable_role :affected
 update role set active = :active
-where id = :id
+where id = :id;
 
+-- :name get_user_role_assignments :many
+select ru.user_id as user_id, ru.role_id as role_id
+from role_user ru
+where ru.user_id in :user_ids and ru.role_id in :role_ids;
 
+-- :name get_role_assignments :many
+select ru.user_id, ru.role_id
+from role_user ru
+where ru.role_id in :role_ids;
 
-
----- :name grant_create
---create table if not exists grant (
---    id integer primary key,
---    permission_id integer,
---    role_id integer,
---    active integer
---);
---
----- :name permission_create
---create table if not exists permission (
---    id integer primary key,
---    resource_id integer,
---    name varchar(25),
---    active integer
---);
---
----- :name resource
---create table if not exists resource (
---    id integer primary key,
---    name varchar(25),
---    active integer
---);
-
+-- :name get_roles_by_resource :many
+select *
+from role r
+where r.name like :resource;
 
