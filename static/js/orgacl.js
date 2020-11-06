@@ -102,7 +102,9 @@ function save_roles(){
         data: JSON.stringify(body),
         contentType: 'application/json',
         success: function(response){
-
+            $('.changed').each(function(){
+                $(this).removeClass('changed');
+            })
         }
     });
 
